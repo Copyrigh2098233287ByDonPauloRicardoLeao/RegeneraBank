@@ -24,7 +24,9 @@ export class ReconciliationService {
   @Cron(process.env.RECONCILIATION_CRON || '0 * * * *')
   async runHourlyReconciliation() {
     if (process.env.RECONCILIATION_ENABLED === 'false') {
-      this.logger.log('Reconciliação automática desativada (RECONCILIATION_ENABLED=false).');
+      this.logger.log(
+        'Reconciliação automática desativada (RECONCILIATION_ENABLED=false).',
+      );
       return;
     }
     return this.runAutomatedReconciliation();
@@ -51,7 +53,7 @@ export class ReconciliationService {
         this.logger.error(
           `[CRITICAL ALERTA VIGIA] Divergência na conta ${account.id} (Neural ID: ${account.neuralId}). Saldo: ${account.balanceCents}, Ledger: ${ledgerSum}`,
         );
-        
+
         // Ação: Congelar conta
         account.status = 'FROZEN';
         await this.accountRepo.save(account);

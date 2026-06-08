@@ -23,25 +23,48 @@ export class MetricsService {
     private readonly outboxRepo: Repository<OutboxEventEntity>,
   ) {}
 
-  incrementPixRequests() { this.pixRequests++; }
-  incrementPixReplays() { this.pixReplays++; }
-  incrementPixFailed() { this.pixFailed++; }
-  incrementLedgerDebit() { this.ledgerDebit++; }
-  incrementLedgerCredit() { this.ledgerCredit++; }
-  incrementLedgerBalanceDivergence() { this.ledgerBalanceDivergence++; }
-  incrementIdempotencyLockConflict() { this.idempotencyLockConflict++; }
-  incrementRedisUnavailable() { this.redisUnavailable++; }
-  incrementDbLockTimeout() { this.dbLockTimeout++; }
-  setReconciliationDuration(seconds: number) { this.reconciliationDuration = seconds; }
-  
+  incrementPixRequests() {
+    this.pixRequests++;
+  }
+  incrementPixReplays() {
+    this.pixReplays++;
+  }
+  incrementPixFailed() {
+    this.pixFailed++;
+  }
+  incrementLedgerDebit() {
+    this.ledgerDebit++;
+  }
+  incrementLedgerCredit() {
+    this.ledgerCredit++;
+  }
+  incrementLedgerBalanceDivergence() {
+    this.ledgerBalanceDivergence++;
+  }
+  incrementIdempotencyLockConflict() {
+    this.idempotencyLockConflict++;
+  }
+  incrementRedisUnavailable() {
+    this.redisUnavailable++;
+  }
+  incrementDbLockTimeout() {
+    this.dbLockTimeout++;
+  }
+  setReconciliationDuration(seconds: number) {
+    this.reconciliationDuration = seconds;
+  }
+
   recordHttpRequestDuration(seconds: number) {
     this.httpReqDurationSum += seconds;
     this.httpReqCount++;
   }
 
   async getMetricsText(): Promise<string> {
-    const outboxPending = await this.outboxRepo.count({ where: { status: 'PENDING' } });
-    const avgDuration = this.httpReqCount > 0 ? this.httpReqDurationSum / this.httpReqCount : 0;
+    const outboxPending = await this.outboxRepo.count({
+      where: { status: 'PENDING' },
+    });
+    const avgDuration =
+      this.httpReqCount > 0 ? this.httpReqDurationSum / this.httpReqCount : 0;
 
     return [
       `# HELP pix_requests_total Total number of Pix requests`,

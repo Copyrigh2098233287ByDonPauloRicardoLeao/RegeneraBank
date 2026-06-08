@@ -88,26 +88,33 @@ describe('Ledger Invariants Compliance Test Suite', () => {
   it('invariante 2: debito sempre tem credito correspondente e nao permite saldo negativo', async () => {
     const sender = await coreService.createAccount('inv_sender');
     const receiver = await coreService.createAccount('inv_receiver');
-    
+
     // Seed
     await coreService.seedAccountBalance('inv_sender', 5000); // R$ 50
-    
+
     // Transfer
     await coreService.transfer('inv_sender', 'inv_receiver', 2000);
 
     const senderTxs = await txRepo.find({ where: { accountId: sender.id } });
-    const receiverTxs = await txRepo.find({ where: { accountId: receiver.id } });
+    const receiverTxs = await txRepo.find({
+      where: { accountId: receiver.id },
+    });
 
     // Debit of 2000, credit of 2000
-    const lastDebit = senderTxs.find(t => t.type === 'INTERNAL_TED_OUT' && Number(t.amountCents) === -2000);
-    const lastCredit = receiverTxs.find(t => t.type === 'INTERNAL_TED_IN' && Number(t.amountCents) === 2000);
+    const lastDebit = senderTxs.find(
+      (t) => t.type === 'INTERNAL_TED_OUT' && Number(t.amountCents) === -2000,
+    );
+    const lastCredit = receiverTxs.find(
+      (t) => t.type === 'INTERNAL_TED_IN' && Number(t.amountCents) === 2000,
+    );
 
     expect(lastDebit).toBeDefined();
     expect(lastCredit).toBeDefined();
 
     // Insufficient funds rollback check
-    await expect(coreService.transfer('inv_sender', 'inv_receiver', 10000))
-      .rejects.toThrow();
+    await expect(
+      coreService.transfer('inv_sender', 'inv_receiver', 10000),
+    ).rejects.toThrow();
 
     // Verify balance was not deducted on failed transfer
     const senderAcc = await accountRepo.findOne({ where: { id: sender.id } });
@@ -117,7 +124,7 @@ describe('Ledger Invariants Compliance Test Suite', () => {
   it('invariante 3: a chain de hashes do ledger e valida e quebra se alterada', async () => {
     const user = await coreService.createAccount('inv_chain_user');
     await coreService.seedAccountBalance('inv_chain_user', 10000);
-    
+
     await coreService.debit('inv_chain_user', 1000);
     await coreService.debit('inv_chain_user', 2000);
     await coreService.debit('inv_chain_user', 3000);

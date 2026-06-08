@@ -147,8 +147,13 @@ export class AuthController {
   @Post('test-token')
   @HttpCode(HttpStatus.OK)
   async getTestToken(@Body() body: { neuralId: string; email: string }) {
-    if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'development') {
-      throw new ForbiddenException('Endpoint restricted to testing environment.');
+    if (
+      process.env.NODE_ENV !== 'test' &&
+      process.env.NODE_ENV !== 'development'
+    ) {
+      throw new ForbiddenException(
+        'Endpoint restricted to testing environment.',
+      );
     }
     return this.authService.generateTestToken(body.neuralId, body.email);
   }
