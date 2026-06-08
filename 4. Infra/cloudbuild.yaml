@@ -31,16 +31,16 @@
 #
 # To run: gcloud builds submit --config=infra/cloudbuild.yaml .   (from project root)
 steps:
-  # 1. Backend: Install Dependencies & Run Unit Tests (skipped for deploy to speed up; tests can be run locally)
-  # - id: backend-tests
-  #   name: 'node:20'
-  #   dir: 'backend'
-  #   entrypoint: 'bash'
-  #   args: 
-  #     - '-c'
-  #     - |
-  #       npm ci --silent
-  #       npm run test:ci
+  # 1. Backend: Install Dependencies & Run Unit Tests
+  - id: backend-tests
+    name: 'node:20'
+    dir: 'backend'
+    entrypoint: 'bash'
+    args: 
+      - '-c'
+      - |
+        npm ci --silent
+        npm run test:ci
 
   # 2. Build Containerized Application (NestJS Core)
   - id: build-image

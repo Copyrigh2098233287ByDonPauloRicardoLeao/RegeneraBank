@@ -36,7 +36,7 @@ config();
 const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : { rejectUnauthorized: false },
+  ssl: { rejectUnauthorized: process.env.NODE_ENV === 'production' },
   entities: [UserEntity, AccountEntity, TransactionEntity, InvestmentEntity, PixKeyEntity, IdempotencyLogEntity],
   migrations: ['src/migrations/*.ts', 'dist/src/migrations/*.js'],
   synchronize: false,
