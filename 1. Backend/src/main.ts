@@ -98,7 +98,10 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api-docs', app, document);
   // Expose raw JSON for orval / external consumers (no auth for spec)
-  app.use('/v1/api-docs-json', (_req: any, res: any) => {
+  app.use('/v1/api-docs-json', (_req: any, res: any, next: any) => {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(403).send({ error: 'Swagger disabled in production' });
+    }
     res.setHeader('Content-Type', 'application/json');
     res.send(document);
   });

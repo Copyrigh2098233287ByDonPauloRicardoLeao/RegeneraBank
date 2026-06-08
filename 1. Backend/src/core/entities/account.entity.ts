@@ -56,8 +56,8 @@ export class AccountEntity {
   @Column({ name: 'account_number', unique: true })
   accountNumber: string;
 
-  @Column('decimal', { precision: 19, scale: 4, default: 0 })
-  balance: number;
+  @Column('bigint', { default: 0 })
+  balanceCents: number;
 
   @Column({ default: 'BRL' })
   currency: string;

@@ -16,26 +16,41 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
                engenharia reversa ou modificação não autorizada.
 
 |---------------------------------------------------------------------------------------|
-|  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
+|  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW    |
 |---------------------------------------------------------------------------------------|
 */
 
-module.exports = {
-  moduleFileExtensions: ['js', 'json', 'ts'],
-  rootDir: '.',
-  testRegex: '.*\\.spec\\.ts$',
-  transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
-  },
-  collectCoverageFrom: ['**/*.(t|j)s'],
-  coverageDirectory: '../coverage',
-  testEnvironment: 'node',
-  coverageThreshold: {
-    global: {
-      branches: 80,
-      functions: 80,
-      lines: 80,
-      statements: 80
-    }
-  }
-};
+import {
+  Entity,
+  Column,
+  PrimaryGeneratedColumn,
+  CreateDateColumn,
+  UpdateDateColumn,
+} from 'typeorm';
+
+@Entity('outbox_events')
+export class OutboxEventEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
+
+  @Column()
+  topic: string; // The Pub/Sub topic to publish to
+
+  @Column({ type: 'simple-json' })
+  payload: Record<string, any>;
+
+  @Column({ default: 'PENDING' })
+  status: string; // PENDING, PROCESSED, FAILED
+
+  @Column({ default: 0 })
+  retryCount: number;
+
+  @Column({ nullable: true })
+  errorReason?: string;
+
+  @CreateDateColumn({ name: 'created_at' })
+  createdAt: Date;
+
+  @UpdateDateColumn({ name: 'updated_at' })
+  updatedAt: Date;
+}

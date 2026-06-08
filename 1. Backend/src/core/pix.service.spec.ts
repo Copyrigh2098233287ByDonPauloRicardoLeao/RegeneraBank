@@ -4,7 +4,7 @@ import { CoreService } from './core.service';
 import { PixEventsGateway } from './pix.gateway';
 import { IdempotencyService } from './idempotency.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { AccountEntity } from '../accounts/account.entity';
+import { AccountEntity } from './entities/account.entity';
 import { BadRequestException, HttpException } from '@nestjs/common';
 
 jest.mock('@google-cloud/pubsub', () => ({

@@ -34,7 +34,7 @@ steps:
   # 1. Backend: Install Dependencies & Run Unit Tests
   - id: backend-tests
     name: 'node:20'
-    dir: 'backend'
+    dir: '1. Backend'
     entrypoint: 'bash'
     args: 
       - '-c'
@@ -50,7 +50,7 @@ steps:
       - '-t'
       - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/regenera-repo/core-api:$BUILD_ID'
       - '-f'
-      - 'backend/Dockerfile'
+      - '1. Backend/Dockerfile'
       - '.'
 
   # 3. Security Audit: Scan Container for Vulnerabilities

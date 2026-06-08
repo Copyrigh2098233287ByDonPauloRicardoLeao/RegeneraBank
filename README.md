@@ -38,7 +38,7 @@ Este projeto adota a arquitetura **FSD (Feature-Sliced Design)** orientada a dom
 ## 🔐 Governança, CI/CD e Qualidade (10/10 Grade)
 
 Para manter o status de *Production Grade*, este repositório adota métricas extremas de CI/CD:
-- **Zero Compiling Errors**: O Typescript possui `strict: true` e todas as tipagens são honradas no ambiente.
+- **Zero Compiling Errors**: O código passa no build de forma nativa e as tipagens principais são honradas no ambiente.
 - **Strict Testing**: O comando de integração contínua (`npm run test:ci`) exige cobertura estrita, rejeitando a flag permissiva `--passWithNoTests`.
 - **Clean Audit**: Ausência de vestígios de IA na árvore de diretórios, códigos limpos e coesos.
 - **Idempotência Garantida**: Todos os *endpoints* transacionais (`/lifestyle/marketplace/buy`, `/investments/trade`, `/webhook/pix`) requerem chaves de idempotência para garantir `at-most-once delivery`.
