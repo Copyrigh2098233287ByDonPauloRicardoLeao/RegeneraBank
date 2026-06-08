@@ -42,7 +42,7 @@ export class TransactionEntity {
   @Column({ name: 'account_id' })
   accountId: string;
 
-  @Column('integer')
+  @Column('integer', { name: 'amount_cents' })
   amountCents: number;
 
   @Column()

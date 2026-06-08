@@ -56,7 +56,7 @@ export class AccountEntity {
   @Column({ name: 'account_number', unique: true })
   accountNumber: string;
 
-  @Column('bigint', { default: 0 })
+  @Column('bigint', { name: 'balance_cents', default: 0 })
   balanceCents: number;
 
   @Column({ default: 'BRL' })
