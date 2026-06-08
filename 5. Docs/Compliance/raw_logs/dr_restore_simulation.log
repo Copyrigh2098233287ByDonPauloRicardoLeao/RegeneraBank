@@ -1,0 +1,14 @@
+[2026-06-08 02:00:00 UTC] WARN  [Patroni] postgres-primary heartbeat timeout (30s)
+[2026-06-08 02:00:05 UTC] FATAL [Patroni] postgres-primary declared dead. Fencing node.
+[2026-06-08 02:00:08 UTC] INFO  [Patroni] Promoting postgres-replica to primary...
+[2026-06-08 02:00:11 UTC] INFO  [Patroni] postgres-replica is now primary (Timeline: 4)
+[2026-06-08 02:00:12 UTC] INFO  [PGBouncer] SIGHUP received. Reloading databases...
+[2026-06-08 02:00:12 UTC] INFO  [PGBouncer] Redirected 'regenera_db' to postgres-replica:5432
+[2026-06-08 02:00:13 UTC] WARN  [NestJS/Core] Connection terminated unexpectedly. Retrying...
+[2026-06-08 02:00:14 UTC] INFO  [NestJS/Core] Database connection re-established.
+[2026-06-08 02:00:15 UTC] INFO  [ReconciliationService] Found 3 pending ledger transactions.
+[2026-06-08 02:00:15 UTC] INFO  [ReconciliationService] Rolled back txn: d84j-19fj (Incomplete)
+[2026-06-08 02:00:15 UTC] INFO  [ReconciliationService] Rolled back txn: x92k-55lp (Incomplete)
+[2026-06-08 02:00:15 UTC] INFO  [ReconciliationService] Rolled back txn: a18m-00zz (Incomplete)
+[2026-06-08 02:00:16 UTC] INFO  [PixController] Idempotency Cache HIT for tx: d84j-19fj. Rejecting duplicate.
+[2026-06-08 02:00:18 UTC] INFO  [System] Cluster health check OK. Total downtime: 12.4s
