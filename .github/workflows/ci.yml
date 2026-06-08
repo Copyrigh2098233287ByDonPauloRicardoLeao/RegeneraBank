@@ -98,30 +98,4 @@ jobs:
         working-directory: ./3. FrontEnd
         run: npm run build
 
-      # --- DEVSECOPS & ARTIFACT SEC ---
-      - name: Repository Secret Scan (Mock/Fallback)
-        run: |
-          echo "Executing Gitleaks secret detection..."
-          # Mock check for high severity secret markers in code
-          if grep -r "ghp_" --exclude-dir=.git --exclude-dir=node_modules --exclude=scripts/audit-human-style.sh --exclude=scratch_comando.txt .; then
-            echo "Secrets detected!"
-          else
-            echo "No hardcoded secrets found in codebase."
-          fi
 
-      - name: SAST & Code Security Scan (Semgrep Fallback)
-        run: |
-          echo "Executing SAST vulnerability analysis..."
-          echo "SAST scan passed successfully with 0 critical findings."
-
-      - name: Container Image Build & Scan (Docker Fallback)
-        run: |
-          echo "Building local production container..."
-          docker build -t regenera-bank-backend:v4.0.0 "./1. Backend"
-          echo "Scanning container image with Trivy..."
-          echo "Trivy scan passed. 0 critical vulnerabilities."
-
-      - name: Post-Build Smoke Test
-        run: |
-          echo "Starting service smoke test..."
-          echo "Service health check UP."
