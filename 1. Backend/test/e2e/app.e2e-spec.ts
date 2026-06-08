@@ -32,4 +32,17 @@ describe('AppController (e2e)', () => {
         expect(res.body.status).toBe('UP');
       });
   });
+
+  it('/metrics (GET)', () => {
+    return request(app.getHttpServer())
+      .get('/metrics')
+      .expect(200)
+      .expect('Content-Type', /text\/plain/)
+      .expect((res) => {
+        expect(res.text).toContain('pix_requests_total');
+        expect(res.text).toContain('ledger_debit_total');
+        expect(res.text).toContain('ledger_credit_total');
+        expect(res.text).toContain('outbox_pending_total');
+      });
+  });
 });

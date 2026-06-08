@@ -29,6 +29,7 @@ import { PixKeyEntity } from '../src/core/entities/pix-key.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException } from '@nestjs/common';
 import { AccountEntity } from '../src/core/entities/account.entity';
+import { MetricsService } from '../src/metrics/metrics.service';
 
 describe('Pix Concurrency & Idempotency Test', () => {
   let pixService: PixService;
@@ -38,6 +39,22 @@ describe('Pix Concurrency & Idempotency Test', () => {
     let locked = false;
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        {
+          provide: MetricsService,
+          useValue: {
+            incrementPixRequests: jest.fn(),
+            incrementPixReplays: jest.fn(),
+            incrementPixFailed: jest.fn(),
+            incrementLedgerDebit: jest.fn(),
+            incrementLedgerCredit: jest.fn(),
+            incrementLedgerBalanceDivergence: jest.fn(),
+            incrementIdempotencyLockConflict: jest.fn(),
+            incrementRedisUnavailable: jest.fn(),
+            incrementDbLockTimeout: jest.fn(),
+            setReconciliationDuration: jest.fn(),
+            recordHttpRequestDuration: jest.fn(),
+          },
+        },
         {
           provide: IdempotencyService,
           useValue: {

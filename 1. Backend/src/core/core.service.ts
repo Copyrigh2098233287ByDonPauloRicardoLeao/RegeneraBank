@@ -36,6 +36,7 @@ import { AccountEntity } from './entities/account.entity';
 import { TransactionEntity } from './entities/transaction.entity';
 import { OutboxEventEntity } from './entities/outbox-event.entity';
 import { createHash } from 'crypto';
+import { MetricsService } from '../metrics/metrics.service';
 
 // Tipagem de Erros de Negócio Bancário Customizados
 export class FinancialSecurityException extends HttpException {
@@ -67,6 +68,7 @@ export class CoreService implements OnModuleInit {
     @InjectRepository(TransactionEntity)
     private readonly txRepo: Repository<TransactionEntity>,
     private readonly dataSource: DataSource,
+    private readonly metricsService: MetricsService,
   ) {
     this.secretsClient = new SecretManagerServiceClient();
   }
@@ -177,6 +179,14 @@ export class CoreService implements OnModuleInit {
       status: 'ACTIVE',
     });
     return this.accountRepo.save(account);
+  }
+
+  async seedAccountBalance(neuralId: string, cents: number): Promise<void> {
+    const account = await this.accountRepo.findOne({ where: { neuralId } });
+    if (account) {
+      account.balanceCents = cents;
+      await this.accountRepo.save(account);
+    }
   }
 
   async getDashboard(neuralId: string) {
@@ -336,6 +346,8 @@ export class CoreService implements OnModuleInit {
           meta,
         );
 
+        this.metricsService.incrementLedgerDebit();
+
         this.logger.log(
           `[LEDGER OUT] Conta ${account.accountNumber} debitada em ${amountCents / 100}. Novo saldo: ${newBalanceCents / 100}`,
         );
@@ -383,6 +395,8 @@ export class CoreService implements OnModuleInit {
           meta?.type || 'CREDIT',
           meta,
         );
+
+        this.metricsService.incrementLedgerCredit();
 
         this.logger.log(
           `[LEDGER IN] Conta ${account.accountNumber} creditada em ${amountCents / 100}. Novo saldo: ${newBalanceCents / 100}`,

@@ -46,6 +46,8 @@ import { NeuralCoreModule } from './neural-core/neural-core.module';
 import { InfraModule } from './infra/infra.module';
 import { ReconciliationModule } from './reconciliation/reconciliation.module';
 import { HealthController } from './health.controller';
+import { ScheduleModule } from '@nestjs/schedule';
+import { MetricsModule } from './metrics/metrics.module';
 
 @Module({
   imports: [
@@ -54,6 +56,7 @@ import { HealthController } from './health.controller';
       envFilePath: '.env',
       cache: true,
     }),
+    ScheduleModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -92,6 +95,7 @@ import { HealthController } from './health.controller';
     NeuralCoreModule,
     InfraModule,
     ReconciliationModule,
+    MetricsModule,
   ],
   controllers: [HealthController],
 })

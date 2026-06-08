@@ -35,6 +35,7 @@ import { CoreService } from './core.service';
 import { IdempotencyService } from './idempotency.service';
 import { PixEventsGateway } from './pix.gateway';
 import { AccountEntity } from './entities/account.entity';
+import { MetricsService } from '../metrics/metrics.service';
 
 interface PixSpiPayload {
   endToEndId: string;
@@ -60,6 +61,7 @@ export class PixService {
     private readonly accountRepository: Repository<AccountEntity>,
     @Inject(forwardRef(() => PixEventsGateway))
     private readonly eventsGateway: PixEventsGateway,
+    private readonly metricsService: MetricsService,
   ) {}
 
   /**
@@ -67,11 +69,13 @@ export class PixService {
    * Garante a não-duplicação e credita na conta-corrente o valor.
    */
   async processIncomingPix(data: PixSpiPayload, idempotencyKey: string) {
+    this.metricsService.incrementPixRequests();
     this.logger.log(
       `[SPI INBOUND] Recebendo PIX E2E: ${data.endToEndId} | Origem: ${data.senderIspb}`,
     );
 
     if (!data.amountCents || data.amountCents <= 0) {
+      this.metricsService.incrementPixFailed();
       throw new BadRequestException(
         'Valor transacional inválido para compensação SPI.',
       );
@@ -80,6 +84,7 @@ export class PixService {
     // Controle Absoluto de Double-Spend (Idempotência BACEN)
     const isProcessed = await this.idempotencyGuard.exists(idempotencyKey);
     if (isProcessed) {
+      this.metricsService.incrementPixReplays();
       this.logger.warn(
         `[SPI INBOUND] Replay detectado e descartado para IdempotencyKey: ${idempotencyKey}`,
       );
@@ -125,6 +130,7 @@ export class PixService {
 
       return response;
     } catch (error) {
+      this.metricsService.incrementPixFailed();
       await this.idempotencyGuard.unlock(idempotencyKey);
       this.logger.error(
         `[CRÍTICO] Falha na liquidação SPI Inbound E2E: ${data.endToEndId}. Motivo: ${error.message}`,
@@ -139,11 +145,14 @@ export class PixService {
     amount: number,
     idempotencyKey?: string,
   ) {
+    this.metricsService.incrementPixRequests();
     if (amount <= 0) {
+      this.metricsService.incrementPixFailed();
       throw new BadRequestException('Valor transacional inválido para PIX.');
     }
 
     if (amount >= 9999) {
+      this.metricsService.incrementPixFailed();
       throw new ForbiddenException(
         'Transação bloqueada preventivamente pela esteira de segurança.',
       );
@@ -152,6 +161,7 @@ export class PixService {
     if (idempotencyKey) {
       const cached = await this.idempotencyGuard.get(idempotencyKey);
       if (cached) {
+        this.metricsService.incrementPixReplays();
         const data = cached.body || cached.payload || cached;
         return { ...data, isCached: true };
       }
@@ -191,6 +201,7 @@ export class PixService {
 
       return response;
     } catch (e) {
+      this.metricsService.incrementPixFailed();
       if (idempotencyKey) {
         await this.idempotencyGuard.releaseLock(idempotencyKey, senderNeuralId);
       }

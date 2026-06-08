@@ -330,6 +330,13 @@ export class AuthService {
     return { success: true };
   }
 
+  async generateTestToken(uid: string, email: string) {
+    await this.coreService.createAccount(uid);
+    await this.coreService.seedAccountBalance(uid, 100000000); // 1 million cents
+    const token = await this.issueToken(uid, email);
+    return { accessToken: token };
+  }
+
   async refreshToken(user: any) {
     return { token: 'refreshed-mock-token' };
   }

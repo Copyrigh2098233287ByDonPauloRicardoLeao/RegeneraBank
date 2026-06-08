@@ -1,8 +1,11 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Cron } from '@nestjs/schedule';
 import { AccountEntity } from '../core/entities/account.entity';
-import { LedgerEntryEntity } from '../core/entities/ledger-entry.entity';
+import { TransactionEntity } from '../core/entities/transaction.entity';
+import { OutboxEventEntity } from '../core/entities/outbox-event.entity';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
 export class ReconciliationService {
@@ -11,39 +14,69 @@ export class ReconciliationService {
   constructor(
     @InjectRepository(AccountEntity)
     private readonly accountRepo: Repository<AccountEntity>,
-    @InjectRepository(LedgerEntryEntity)
-    private readonly ledgerRepo: Repository<LedgerEntryEntity>,
+    @InjectRepository(TransactionEntity)
+    private readonly txRepo: Repository<TransactionEntity>,
+    @InjectRepository(OutboxEventEntity)
+    private readonly outboxRepo: Repository<OutboxEventEntity>,
+    private readonly metricsService: MetricsService,
   ) {}
 
+  @Cron(process.env.RECONCILIATION_CRON || '0 * * * *')
+  async runHourlyReconciliation() {
+    if (process.env.RECONCILIATION_ENABLED === 'false') {
+      this.logger.log('Reconciliação automática desativada (RECONCILIATION_ENABLED=false).');
+      return;
+    }
+    return this.runAutomatedReconciliation();
+  }
+
   /**
-   * CRON JOB MOCK (Seria executado por @Cron('0 * * * *'))
-   * Vigia do Banco: Valida o saldo da conta com a soma do Ledger.
+   * Vigia do Banco: Valida o saldo da conta com a soma de todas as transações do Ledger.
    */
   async runAutomatedReconciliation() {
+    const startTime = Date.now();
     this.logger.log('Iniciando conciliação automática...');
     const accounts = await this.accountRepo.find();
 
     for (const account of accounts) {
-      const ledgerEntries = await this.ledgerRepo.find({
+      const txs = await this.txRepo.find({
         where: { accountId: account.id },
       });
 
-      const ledgerSum = ledgerEntries.reduce((acc, entry) => {
-        return acc + Number(entry.amountCents);
+      const ledgerSum = txs.reduce((acc, tx) => {
+        return acc + Number(tx.amountCents);
       }, 0);
 
       if (Number(account.balanceCents) !== ledgerSum) {
         this.logger.error(
-          `[ALERTA VIGIA] Divergência na conta ${account.neuralId}. Saldo: ${account.balanceCents}, Ledger: ${ledgerSum}`,
+          `[CRITICAL ALERTA VIGIA] Divergência na conta ${account.id} (Neural ID: ${account.neuralId}). Saldo: ${account.balanceCents}, Ledger: ${ledgerSum}`,
         );
+        
         // Ação: Congelar conta
         account.status = 'FROZEN';
         await this.accountRepo.save(account);
+
+        // Incrementar métrica
+        this.metricsService.incrementLedgerBalanceDivergence();
+
+        // Registrar no Outbox
+        const outbox = this.outboxRepo.create({
+          topic: 'account.frozen',
+          payload: {
+            accountId: account.id,
+            neuralId: account.neuralId,
+            reason: `Reconciliation divergence: Balance ${account.balanceCents} cents, Transaction sum ${ledgerSum} cents.`,
+            timestamp: new Date().toISOString(),
+          },
+        });
+        await this.outboxRepo.save(outbox);
       } else {
         this.logger.log(`Conta ${account.neuralId} reconciliada com sucesso.`);
       }
     }
 
-    this.logger.log('Conciliação finalizada.');
+    const durationSeconds = (Date.now() - startTime) / 1000;
+    this.metricsService.setReconciliationDuration(durationSeconds);
+    this.logger.log(`Conciliação finalizada em ${durationSeconds}s.`);
   }
 }

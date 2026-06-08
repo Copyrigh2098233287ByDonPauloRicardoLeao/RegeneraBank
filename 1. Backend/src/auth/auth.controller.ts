@@ -30,6 +30,7 @@ import {
   HttpStatus,
   Req,
   UseGuards,
+  ForbiddenException,
 } from '@nestjs/common';
 import { IsString, IsEmail, MinLength, IsOptional } from 'class-validator';
 import { AuthService } from './auth.service';
@@ -141,5 +142,14 @@ export class AuthController {
   @UseGuards(NeuralAuthGuard)
   async refresh(@Req() req: any) {
     return this.authService.refreshToken(req.user);
+  }
+
+  @Post('test-token')
+  @HttpCode(HttpStatus.OK)
+  async getTestToken(@Body() body: { neuralId: string; email: string }) {
+    if (process.env.NODE_ENV !== 'test' && process.env.NODE_ENV !== 'development') {
+      throw new ForbiddenException('Endpoint restricted to testing environment.');
+    }
+    return this.authService.generateTestToken(body.neuralId, body.email);
   }
 }

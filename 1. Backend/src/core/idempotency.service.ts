@@ -27,13 +27,14 @@ import {
   OnModuleDestroy,
 } from '@nestjs/common';
 import Redis from 'ioredis';
+import { MetricsService } from '../metrics/metrics.service';
 
 @Injectable()
 export class IdempotencyService implements OnModuleDestroy {
   private redis!: Redis;
   private readonly logger = new Logger(IdempotencyService.name);
 
-  constructor() {
+  constructor(private readonly metricsService: MetricsService) {
     try {
       if (process.env.NODE_ENV === 'test') {
         const store = new Map<string, string>();
@@ -61,12 +62,14 @@ export class IdempotencyService implements OnModuleDestroy {
           },
         );
         this.redis.on('error', (err) => {
+          this.metricsService.incrementRedisUnavailable();
           this.logger.error(
             `Redis connection error. Idempotency is severely degraded: ${err.message}`,
           );
         });
       }
     } catch (e) {
+      this.metricsService.incrementRedisUnavailable();
       this.logger.error(
         'Failed to initialize Redis. System cannot guarantee idempotency without it.',
       );
@@ -93,6 +96,7 @@ export class IdempotencyService implements OnModuleDestroy {
     const lockKey = `idempotency_lock:${neuralId}:${key}`;
     const result = await this.redis.set(lockKey, 'LOCKED', 'EX', 60, 'NX');
     if (!result) {
+      this.metricsService.incrementIdempotencyLockConflict();
       this.logger.warn(`Idempotency lock failed for key: ${key}`);
       throw new ConflictException('Transação já processada ou em andamento.');
     }

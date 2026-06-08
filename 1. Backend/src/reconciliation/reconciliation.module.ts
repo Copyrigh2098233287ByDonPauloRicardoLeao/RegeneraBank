@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountEntity } from '../core/entities/account.entity';
-import { LedgerEntryEntity } from '../core/entities/ledger-entry.entity';
+import { TransactionEntity } from '../core/entities/transaction.entity';
+import { OutboxEventEntity } from '../core/entities/outbox-event.entity';
 import { ReconciliationService } from './reconciliation.service';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([AccountEntity, LedgerEntryEntity])],
+  imports: [TypeOrmModule.forFeature([AccountEntity, TransactionEntity, OutboxEventEntity])],
   providers: [ReconciliationService],
   exports: [ReconciliationService],
 })

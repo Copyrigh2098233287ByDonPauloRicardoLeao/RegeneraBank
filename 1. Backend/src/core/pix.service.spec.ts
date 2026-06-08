@@ -6,6 +6,7 @@ import { IdempotencyService } from './idempotency.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { AccountEntity } from './entities/account.entity';
 import { BadRequestException, HttpException } from '@nestjs/common';
+import { MetricsService } from '../metrics/metrics.service';
 
 jest.mock('@google-cloud/pubsub', () => ({
   PubSub: jest.fn().mockImplementation(() => ({
@@ -48,6 +49,20 @@ describe('PixService (Unit Tests)', () => {
     delete: jest.fn(),
   };
 
+  const mockMetricsService = {
+    incrementPixRequests: jest.fn(),
+    incrementPixReplays: jest.fn(),
+    incrementPixFailed: jest.fn(),
+    incrementLedgerDebit: jest.fn(),
+    incrementLedgerCredit: jest.fn(),
+    incrementLedgerBalanceDivergence: jest.fn(),
+    incrementIdempotencyLockConflict: jest.fn(),
+    incrementRedisUnavailable: jest.fn(),
+    incrementDbLockTimeout: jest.fn(),
+    setReconciliationDuration: jest.fn(),
+    recordHttpRequestDuration: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -56,6 +71,7 @@ describe('PixService (Unit Tests)', () => {
         { provide: PixEventsGateway, useValue: mockGateway },
         { provide: IdempotencyService, useValue: mockIdempotency },
         { provide: getRepositoryToken(AccountEntity), useValue: {} },
+        { provide: MetricsService, useValue: mockMetricsService },
       ],
     }).compile();
 
