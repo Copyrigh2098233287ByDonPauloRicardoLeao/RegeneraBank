@@ -77,6 +77,6 @@ export class CoreController {
     @Req() req: any,
     @Body() body: { receiverId: string; amount: number },
   ) {
-    return this.coreService.transfer(req.user.sub, body.receiverId, body.amount);
+    return this.coreService.transfer(req.user.sub, body.receiverId, Math.round(body.amount * 100));
   }
 }

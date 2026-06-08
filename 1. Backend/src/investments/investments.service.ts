@@ -154,7 +154,7 @@ export class InvestmentsService {
 
       if (orderType === 'BUY') {
         // Débito no Ledger com concorrência segura
-        await this.coreService.debit(neuralId, totalVolumeCents / 100, { 
+        await this.coreService.debit(neuralId, totalVolumeCents, { 
           type: 'BROKERAGE_BUY', 
           counterpartyKey: symbol,
           endToEndId: tradeId
@@ -200,7 +200,7 @@ export class InvestmentsService {
         }
 
         // Liquidação financeira T+0
-        await this.coreService.credit(neuralId, totalVolumeCents / 100, { 
+        await this.coreService.credit(neuralId, totalVolumeCents, { 
           type: 'BROKERAGE_SELL', 
           counterpartyKey: symbol,
           endToEndId: tradeId

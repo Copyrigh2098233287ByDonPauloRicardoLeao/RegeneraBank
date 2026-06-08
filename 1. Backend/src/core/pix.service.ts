@@ -127,7 +127,7 @@ export class PixService {
     }
 
     try {
-      const result = await this.ledgerService.executePixAtomic(senderNeuralId, receiverKey, amount, {
+      const result = await this.ledgerService.executePixAtomic(senderNeuralId, receiverKey, Math.round(amount * 100), {
         endToEndId: `E2E_TEST_${Date.now()}`,
         idempotencyKey,
       });

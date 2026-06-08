@@ -37,6 +37,7 @@ import { TransactionEntity } from './entities/transaction.entity';
 import { UserEntity } from './entities/user.entity';
 import { PixKeyEntity } from './entities/pix-key.entity';
 import { IdempotencyLogEntity } from './entities/idempotency-log.entity';
+import { OutboxEventEntity } from './entities/outbox-event.entity';
 
 @Module({
   imports: [
@@ -46,7 +47,8 @@ import { IdempotencyLogEntity } from './entities/idempotency-log.entity';
       AccountEntity, 
       TransactionEntity, 
       PixKeyEntity, 
-      IdempotencyLogEntity
+      IdempotencyLogEntity,
+      OutboxEventEntity
     ]),
   ],
   controllers: [CoreController, PixController],

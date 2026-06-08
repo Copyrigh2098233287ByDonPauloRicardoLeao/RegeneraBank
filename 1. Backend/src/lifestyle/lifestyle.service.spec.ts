@@ -75,7 +75,7 @@ describe('LifestyleService (Dreams & Marketplace)', () => {
       const result = await service.addFundsToDream('usr_1', 'dream_1', 5000, 'idemp-123'); // 50 reais
       
       expect(result.status).toBe('SETTLED');
-      expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 50, expect.any(Object));
+      expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 5000, expect.any(Object));
       // Verifica se a idempotência foi destravada e salva
       expect(idempotencyMock.acquireLock).toHaveBeenCalled();
     });
@@ -95,7 +95,7 @@ describe('LifestyleService (Dreams & Marketplace)', () => {
       const result = await service.processMarketplacePurchase('usr_1', 'prod_123');
       
       expect(result.status).toBe('APPROVED');
-      expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 15, expect.objectContaining({ type: 'MARKETPLACE_BUY' }));
+      expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 1500, expect.objectContaining({ type: 'MARKETPLACE_BUY' }));
     });
   });
 });

@@ -54,7 +54,7 @@ async function bootstrap() {
     let discrepancyReason = null;
     
     // Heuristic mismatch checks
-    if (Math.abs(tx.amount) === 0) {
+    if (Math.abs(tx.amountCents) === 0) {
       externalMatch = false;
       discrepancyReason = 'Zero value transaction recorded';
     } else if (tx.status !== 'COMPLETED') {
@@ -66,7 +66,7 @@ async function bootstrap() {
       reconciledCount++;
     } else {
       discrepanciesCount++;
-      console.warn(`[DISCREPANCY DETECTED] Tx ${tx.id} | Amount: ${tx.amount} | Reason: ${discrepancyReason}`);
+      console.warn(`[DISCREPANCY DETECTED] Tx ${tx.id} | Amount Cents: ${tx.amountCents} | Reason: ${discrepancyReason}`);
     }
   }
   

@@ -27,6 +27,8 @@ import { v4 as uuidv4 } from 'uuid';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { AccountEntity } from './entities/account.entity';
 import { TransactionEntity } from './entities/transaction.entity';
+import { OutboxEventEntity } from './entities/outbox-event.entity';
+import { createHash } from 'crypto';
 
 // Tipagem de Erros de Negócio Bancário Customizados
 export class FinancialSecurityException extends HttpException {
@@ -140,11 +142,27 @@ export class CoreService implements OnModuleInit {
         id: t.id,
         type: t.type,
         counterparty: t.counterpartyName || t.counterpartyKey || 'Operação Interna',
-        amount: Number(t.amount),
+        amount: Number(t.amountCents) / 100,
         e2eId: t.endToEndId,
         settledAt: t.createdAt.toISOString(),
       })),
     };
+  }
+
+  
+  private async recordLedgerEntry(queryRunner: any, accountId: string, amountCents: number, balanceAfterCents: number, type: string, meta?: Partial<TransactionEntity>) {
+    const txRepo = queryRunner.manager.getRepository(TransactionEntity);
+    const outboxRepo = queryRunner.manager.getRepository(OutboxEventEntity);
+    const lastTx = await txRepo.createQueryBuilder('tx').where('tx.accountId = :accountId', { accountId }).orderBy('tx.createdAt', 'DESC').getOne();
+    const previousHash = lastTx?.hash || 'GENESIS_HASH';
+    const idempotencyKey = meta?.idempotencyKey || null;
+    const createdAt = new Date();
+    const rawString = `${previousHash}|${accountId}|${amountCents}|${type}|${idempotencyKey}|${createdAt.toISOString()}`;
+    const hash = createHash('sha256').update(rawString).digest('hex');
+    const entry = txRepo.create({ accountId, amountCents, balanceAfterCents, type, status: 'SETTLED', counterpartyName: meta?.counterpartyName, counterpartyKey: meta?.counterpartyKey, endToEndId: meta?.endToEndId, idempotencyKey, previousHash, hash, createdAt });
+    await txRepo.save(entry);
+    await outboxRepo.save(outboxRepo.create({ topic: 'ledger.transaction.settled', payload: { transactionId: entry.id, accountId, amountCents, balanceAfterCents, type, hash } }));
+    return entry;
   }
 
   async freezeAccount(neuralId: string, reason: string): Promise<void> {
@@ -154,17 +172,7 @@ export class CoreService implements OnModuleInit {
       account.status = 'BLOCKED_JUDICIAL';
       await queryRunner.manager.getRepository(AccountEntity).save(account);
       
-      // Adiciona flag de auditoria para o BACEN no histórico
-      await queryRunner.manager.getRepository(TransactionEntity).save(
-        queryRunner.manager.getRepository(TransactionEntity).create({
-          accountId: account.id,
-          amount: 0,
-          type: 'ACCOUNT_FROZEN',
-          status: 'SETTLED',
-          counterpartyName: 'BACEN / COAF',
-          endToEndId: `FREEZE_${Date.now()}`
-        })
-      );
+      await this.recordLedgerEntry(queryRunner, account.id, 0, Number(account.balanceCents), 'ACCOUNT_FROZEN', { counterpartyName: 'BACEN / COAF', endToEndId: `FREEZE_${Date.now()}` });
       
       return true;
     });
@@ -178,7 +186,7 @@ export class CoreService implements OnModuleInit {
   /**
    * Débito Transacional: Redução de saldo com criação de comprovante imutável.
    */
-  async debit(neuralId: string, amount: number, meta?: Partial<TransactionEntity>): Promise<number> {
+  async debit(neuralId: string, amountCents: number, meta?: Partial<TransactionEntity>): Promise<number> {
     if (meta?.idempotencyKey) {
       const existing = await this.txRepo.findOne({ where: { idempotencyKey: meta.idempotencyKey } as any });
       if (existing) {
@@ -189,40 +197,28 @@ export class CoreService implements OnModuleInit {
     }
 
     return this.executeAtomicOperation(neuralId, async (account, queryRunner) => {
-      const amountCents = Math.round(amount * 100);
       const balanceCents = Number(account.balanceCents);
 
       if (balanceCents < amountCents) {
         throw new InsufficientFundsException();
       }
 
-      const newBalance = (balanceCents - amountCents) / 100;
-      account.balanceCents = balanceCents - amountCents;
+      const newBalanceCents = balanceCents - amountCents;
+      account.balanceCents = newBalanceCents;
       
       await queryRunner.manager.getRepository(AccountEntity).save(account);
 
-      await queryRunner.manager.getRepository(TransactionEntity).save(
-        queryRunner.manager.getRepository(TransactionEntity).create({
-          accountId: account.id,
-          amount: -amount,
-          type: meta?.type || 'DEBIT',
-          status: 'SETTLED',
-          counterpartyName: meta?.counterpartyName,
-          counterpartyKey: meta?.counterpartyKey,
-          endToEndId: meta?.endToEndId,
-          idempotencyKey: meta?.idempotencyKey,
-        }),
-      );
+      await this.recordLedgerEntry(queryRunner, account.id, -amountCents, newBalanceCents, meta?.type || 'DEBIT', meta);
 
-      this.logger.log(`[LEDGER OUT] Conta ${account.accountNumber} debitada em ${amount}. Novo saldo: ${newBalance}`);
-      return newBalance;
+      this.logger.log(`[LEDGER OUT] Conta ${account.accountNumber} debitada em ${amountCents/100}. Novo saldo: ${newBalanceCents/100}`);
+      return newBalanceCents / 100;
     });
   }
 
   /**
    * Crédito Transacional: Aumento de saldo com comprovante imutável.
    */
-  async credit(accountId: string, amount: number, meta?: Partial<TransactionEntity>): Promise<number> {
+  async credit(accountId: string, amountCents: number, meta?: Partial<TransactionEntity>): Promise<number> {
     if (meta?.idempotencyKey) {
       const existing = await this.txRepo.findOne({ where: { idempotencyKey: meta.idempotencyKey } as any });
       if (existing) {
@@ -233,29 +229,17 @@ export class CoreService implements OnModuleInit {
     }
 
     return this.executeAtomicOperation(accountId, async (account, queryRunner) => {
-      const amountCents = Math.round(amount * 100);
       const balanceCents = Number(account.balanceCents);
 
-      const newBalance = (balanceCents + amountCents) / 100;
-      account.balanceCents = balanceCents + amountCents;
+      const newBalanceCents = balanceCents + amountCents;
+      account.balanceCents = newBalanceCents;
       
       await queryRunner.manager.getRepository(AccountEntity).save(account);
 
-      await queryRunner.manager.getRepository(TransactionEntity).save(
-        queryRunner.manager.getRepository(TransactionEntity).create({
-          accountId: account.id,
-          amount: Math.abs(amount),
-          type: meta?.type || 'CREDIT',
-          status: 'SETTLED',
-          counterpartyName: meta?.counterpartyName,
-          counterpartyKey: meta?.counterpartyKey,
-          endToEndId: meta?.endToEndId,
-          idempotencyKey: meta?.idempotencyKey,
-        }),
-      );
+      await this.recordLedgerEntry(queryRunner, account.id, amountCents, newBalanceCents, meta?.type || 'CREDIT', meta);
 
-      this.logger.log(`[LEDGER IN] Conta ${account.accountNumber} creditada em ${amount}. Novo saldo: ${newBalance}`);
-      return newBalance;
+      this.logger.log(`[LEDGER IN] Conta ${account.accountNumber} creditada em ${amountCents/100}. Novo saldo: ${newBalanceCents/100}`);
+      return newBalanceCents / 100;
     });
   }
 
@@ -265,27 +249,25 @@ export class CoreService implements OnModuleInit {
 
     const txs = await this.txRepo.createQueryBuilder('tx')
       .where('tx.accountId = :accountId', { accountId })
-      .andWhere('tx.amount < 0')
+      .andWhere('tx.amountCents < 0')
       .andWhere('tx.createdAt >= :today', { today })
       .getMany();
 
-    const volume = txs.reduce((sum, tx) => sum + Math.abs(Number(tx.amount)), 0);
-    return Math.round(volume * 100);
+    const volumeCents = txs.reduce((sum, tx) => sum + Math.abs(Number(tx.amountCents)), 0);
+    return volumeCents;
   }
 
   /**
    * TED Interna (Conta para Conta Regenera).
    * Ambas as pernas (Débito e Crédito) ocorrem na MESMA transação no banco.
    */
-  async transfer(senderId: string, receiverId: string, amount: number) {
+  async transfer(senderId: string, receiverId: string, amountCents: number) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
     await queryRunner.startTransaction('READ COMMITTED');
 
     try {
       const accountRepo = queryRunner.manager.getRepository(AccountEntity);
-      const txRepo = queryRunner.manager.getRepository(TransactionEntity);
-      const amountCents = Math.round(amount * 100);
 
       // Lock Ordenado para evitar Deadlocks (ordena IDs lexicalmente)
       const lockOrder = [senderId, receiverId].sort();
@@ -314,18 +296,16 @@ export class CoreService implements OnModuleInit {
 
       await accountRepo.save([sender, receiver]);
 
-      const e2eInternal = `I${Date.now()}${uuidv4().replace(/-/g, '').slice(0,8)}`;
+      const e2eInternal = `I${Date.now()}`;
 
       // Comprovantes Imutáveis
-      await txRepo.save([
-        txRepo.create({ accountId: sender.id, amount: -amount, type: 'INTERNAL_TED_OUT', status: 'SETTLED', counterpartyKey: receiverId, endToEndId: e2eInternal }),
-        txRepo.create({ accountId: receiver.id, amount: amount, type: 'INTERNAL_TED_IN', status: 'SETTLED', counterpartyKey: senderId, endToEndId: e2eInternal })
-      ]);
+      await this.recordLedgerEntry(queryRunner, sender.id, -amountCents, sender.balanceCents, 'INTERNAL_TED_OUT', { counterpartyKey: receiverId, endToEndId: e2eInternal });
+      await this.recordLedgerEntry(queryRunner, receiver.id, amountCents, receiver.balanceCents, 'INTERNAL_TED_IN', { counterpartyKey: senderId, endToEndId: e2eInternal });
 
       await queryRunner.commitTransaction();
-      this.logger.log(`[TED COMPLETA] Transferência ${e2eInternal} liquidada. Valor: ${amount}. Origem: ${senderId}`);
+      this.logger.log(`[TED COMPLETA] Transferência ${e2eInternal} liquidada. Valor: ${amountCents/100}. Origem: ${senderId}`);
 
-      return { status: 'SETTLED_INTERNAL', amount, endToEndId: e2eInternal, timestamp: new Date().toISOString() };
+      return { status: 'SETTLED_INTERNAL', amount: amountCents / 100, endToEndId: e2eInternal, timestamp: new Date().toISOString() };
 
     } catch (error) {
       await queryRunner.rollbackTransaction();
@@ -336,23 +316,23 @@ export class CoreService implements OnModuleInit {
     }
   }
 
-  async executePixAtomic(senderNeuralId: string, receiverKey: string, amount: number, meta: { endToEndId: string; idempotencyKey?: string; typeOut?: string; typeIn?: string }) {
+  async executePixAtomic(senderNeuralId: string, receiverKey: string, amountCents: number, meta: { endToEndId: string; idempotencyKey?: string; typeOut?: string; typeIn?: string }) {
     // Delegado de Pix para TED interno caso a chave pertença a uma conta do mesmo ecossistema (Routing Inteligente)
     const isInternalRouting = receiverKey.includes('RG-') || receiverKey.startsWith('0001');
 
     if (isInternalRouting) {
-      return this.transfer(senderNeuralId, receiverKey, amount);
+      return this.transfer(senderNeuralId, receiverKey, amountCents);
     }
 
     // PIX SPI Externo (Apenas debita, pois o crédito é liquidado no banco de destino pelo Bacen)
-    const newBalance = await this.debit(senderNeuralId, amount, {
+    const newBalance = await this.debit(senderNeuralId, amountCents, {
       type: meta.typeOut || 'PIX_SPI_OUT',
       counterpartyKey: receiverKey,
       endToEndId: meta.endToEndId,
       idempotencyKey: meta.idempotencyKey,
     });
 
-    return { status: 'DEBITED_SPI_READY', amount, senderNewBalance: newBalance, timestamp: new Date().toISOString() };
+    return { status: 'DEBITED_SPI_READY', amount: amountCents/100, senderNewBalance: newBalance, timestamp: new Date().toISOString() };
   }
 
   async revealCardCvv(neuralId: string, cardId: string) {

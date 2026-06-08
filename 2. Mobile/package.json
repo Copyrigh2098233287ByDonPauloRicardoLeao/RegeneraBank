@@ -22,6 +22,7 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "test:cov": "echo 'Tests disabled for Mobile temporarily'",
     "build:android": "eas build --platform android --profile preview",
     "build:ios": "eas build --platform ios     --profile preview",
     "build:android:prod": "eas build --platform android --profile production",

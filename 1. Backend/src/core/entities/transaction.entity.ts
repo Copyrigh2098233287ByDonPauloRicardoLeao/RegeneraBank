@@ -42,8 +42,8 @@ export class TransactionEntity {
   @Column({ name: 'account_id' })
   accountId: string;
 
-  @Column('decimal', { precision: 19, scale: 4 })
-  amount: number;
+  @Column('integer')
+  amountCents: number;
 
   @Column()
   type: string; // PIX_IN, PIX_OUT, TRANSFER_IN, TRANSFER_OUT, etc.
@@ -65,6 +65,15 @@ export class TransactionEntity {
 
   @Column({ type: 'simple-json', nullable: true })
   metadata?: Record<string, any>;
+
+  @Column({ name: 'previous_hash', nullable: true })
+  previousHash?: string; // SHA-256 da transação anterior da mesma conta
+
+  @Column({ name: 'hash', unique: true, nullable: true })
+  hash?: string; // SHA-256(previousHash + accountId + amountCents + type + idempotencyKey + createdAt)
+
+  @Column('integer', { name: 'balance_after_cents', nullable: true })
+  balanceAfterCents?: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

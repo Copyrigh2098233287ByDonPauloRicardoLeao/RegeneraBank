@@ -74,7 +74,7 @@ export class LifestyleService {
     
     try {
       // 1. Débito Financeiro Estrito no Banco Relacional ACID
-      await this.coreService.debit(neuralId, amountCents / 100, {
+      await this.coreService.debit(neuralId, amountCents, {
         type: 'DREAM_CONTRIBUTE',
         counterpartyKey: dreamId,
         endToEndId: idempotencyKey || `DREAM_${Date.now()}`
@@ -137,7 +137,7 @@ export class LifestyleService {
 
     try {
       // 1. Débito no Ledger
-      await this.coreService.debit(neuralId, amountCents / 100, {
+      await this.coreService.debit(neuralId, amountCents, {
         type: 'MARKETPLACE_BUY',
         counterpartyKey: productId
       });

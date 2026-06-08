@@ -236,7 +236,7 @@ export class NeuralCoreService implements OnModuleInit {
       let totalSpending = 0;
 
       for (const t of accountTxs) {
-        const val = Number(t.amount);
+        const val = Number(t.amountCents) / 100;
         if (val > 0) {
           totalIncome += val;
         } else {
