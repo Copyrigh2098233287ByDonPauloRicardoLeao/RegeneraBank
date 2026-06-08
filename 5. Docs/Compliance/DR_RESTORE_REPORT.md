@@ -13,7 +13,7 @@ RegeneraBank utilizes a primary/replica Postgres architecture with continuous WA
 - **Impact:** Connection pool exhaustion, PIX requests blocked.
 
 ## Recovery Sequence Executed
-1. **Automated Failover:** PGBouncer promoted `postgres-replica` to primary. (Time: `T+0m:12s`)
+1. **Automated Failover:** Patroni Cluster Manager detected primary node failure and promoted `postgres-replica` to primary. PGBouncer dynamically reloaded configuration and redirected connection pooling to the new primary. (Time: `T+0m:12s`)
 2. **State Synchronization:** In-flight PIX requests returned 503 during failover (12 seconds window).
 3. **Idempotency Resumption:** Clients automatically retried failed PIX payloads. Redis AOF successfully blocked duplicate operations that were recorded right before crash.
 4. **Reconciliation Job:** `ReconciliationService` chron-job caught 3 "Pending" ledger transactions that failed mid-commit. It rolled them back cleanly.
