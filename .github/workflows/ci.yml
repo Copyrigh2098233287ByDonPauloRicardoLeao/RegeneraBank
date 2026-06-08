@@ -54,12 +54,32 @@ jobs:
       - name: Backend Migration Dry-Run
         working-directory: ./1. Backend
         run: |
-          npm run migration:run || echo "Migration run passed"
-          npm run migration:revert || echo "Migration revert passed"
+          npm run migration:run
+          npm run migration:revert
 
       - name: Dependency Security Audit
         working-directory: ./1. Backend
-        run: npm audit --audit-level=critical || echo "Audit check completed"
+        run: npm audit --audit-level=critical
+
+      - name: Gitleaks Secret Scanner
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trivy Vulnerability Scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      - name: Semgrep SAST
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: "p/default"
 
       # --- FRONTEND AUDIT & QUALITY GATE ---
       - name: Install Frontend Dependencies

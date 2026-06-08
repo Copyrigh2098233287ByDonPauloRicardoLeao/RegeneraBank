@@ -16,7 +16,7 @@ export const options = {
 };
 
 export function setup() {
-  const host = 'http://localhost:3000';
+  const host = 'http://localhost:8080/v1';
   
   // Cria conta do pagador e gera token JWT
   const senderRes = http.post(`${host}/auth/test-token`, JSON.stringify({
@@ -35,7 +35,7 @@ export function setup() {
 }
 
 export default function (data) {
-  const host = 'http://localhost:3000';
+  const host = 'http://localhost:8080/v1';
   const url = `${host}/pix/transfer`;
   
   const idempotencyKey = `k6-key-${__VU}-${__ITER}`;
