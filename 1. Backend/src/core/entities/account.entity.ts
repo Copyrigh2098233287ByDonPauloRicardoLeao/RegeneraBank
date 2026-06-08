@@ -65,6 +65,9 @@ export class AccountEntity {
   @Column({ name: 'is_blocked', default: false })
   isBlocked: boolean;
 
+  @Column({ type: 'varchar', length: 32, default: 'ACTIVE' })
+  status: string;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

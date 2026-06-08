@@ -24,6 +24,7 @@ import { Injectable, Logger, BadRequestException, Inject, forwardRef } from '@ne
 import { BigQuery } from '@google-cloud/bigquery';
 import { Storage } from '@google-cloud/storage';
 import { CoreService } from '../core/core.service';
+import { PepProvider } from './providers/pep.provider';
 
 export interface AmlAnalysisResult {
   isPep: boolean;
@@ -40,7 +41,9 @@ export class ComplianceService {
 
   constructor(
     @Inject(forwardRef(() => CoreService))
-    private readonly ledger: CoreService
+    private readonly ledger: CoreService,
+    @Inject('PEP_PROVIDER')
+    private readonly pepProvider: PepProvider,
   ) {
     this.bigquery = new BigQuery();
     this.storage = new Storage();
@@ -53,9 +56,10 @@ export class ComplianceService {
   async analyzeTransactionRisk(neuralId: string, amountCents: number, originCpf: string): Promise<AmlAnalysisResult> {
     this.logger.log(`[AML] Iniciando análise de PLD para transação de ${amountCents}c no neuralId: ${neuralId}`);
 
-    // Integração Simulada com Bureaus de Crédito e API do COAF para detecção de PEP
-    const isPep = await this.verifyPepStatus(originCpf);
-    let riskScore = isPep ? 60 : 10;
+    // Integração via Adapter Explicitamente Injetado
+    const pepResult = await this.pepProvider.check(originCpf);
+    const isPep = pepResult.isPep;
+    let riskScore = pepResult.score;
 
     // Se a transação for acima de R$ 100.000,00, aumenta o score substancialmente
     if (amountCents > 10000000) {
@@ -78,10 +82,6 @@ export class ComplianceService {
     return { isPep, riskScore, action: 'CLEARED' };
   }
 
-  private async verifyPepStatus(cpf: string): Promise<boolean> {
-    // CPFs com final 13 simbolizam lista restritiva PEP em ambiente de staging
-    return cpf.endsWith('13');
-  }
 
   /**
    * Geração de Documentos Fiscais (DARF/IRRF) usando BigQuery para agregar milhões de linhas.

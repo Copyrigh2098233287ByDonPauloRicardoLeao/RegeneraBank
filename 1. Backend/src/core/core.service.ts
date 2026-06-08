@@ -23,6 +23,7 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 import { Injectable, Logger, BadRequestException, OnModuleInit, HttpException, HttpStatus } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
+import { v4 as uuidv4 } from 'uuid';
 import { SecretManagerServiceClient } from '@google-cloud/secret-manager';
 import { AccountEntity } from './entities/account.entity';
 import { TransactionEntity } from './entities/transaction.entity';
@@ -216,6 +217,60 @@ export class CoreService implements OnModuleInit {
       this.logger.log(`[LEDGER OUT] Conta ${account.accountNumber} debitada em ${amount}. Novo saldo: ${newBalance}`);
       return newBalance;
     });
+  }
+
+  /**
+   * Crédito Transacional: Aumento de saldo com comprovante imutável.
+   */
+  async credit(accountId: string, amount: number, meta?: Partial<TransactionEntity>): Promise<number> {
+    if (meta?.idempotencyKey) {
+      const existing = await this.txRepo.findOne({ where: { idempotencyKey: meta.idempotencyKey } as any });
+      if (existing) {
+        this.logger.log(`[Idempotência] Requisão duplicada barrada no crédito: ${meta.idempotencyKey}`);
+        const acc = await this.accountRepo.findOne({ where: { id: accountId } });
+        return acc ? Number(acc.balance) : 0;
+      }
+    }
+
+    return this.executeAtomicOperation(accountId, async (account, queryRunner) => {
+      const amountCents = Math.round(amount * 100);
+      const balanceCents = Math.round(Number(account.balance) * 100);
+
+      const newBalance = (balanceCents + amountCents) / 100;
+      account.balance = newBalance;
+      
+      await queryRunner.manager.getRepository(AccountEntity).save(account);
+
+      await queryRunner.manager.getRepository(TransactionEntity).save(
+        queryRunner.manager.getRepository(TransactionEntity).create({
+          accountId: account.id,
+          amount: Math.abs(amount),
+          type: meta?.type || 'CREDIT',
+          status: 'SETTLED',
+          counterpartyName: meta?.counterpartyName,
+          counterpartyKey: meta?.counterpartyKey,
+          endToEndId: meta?.endToEndId,
+          idempotencyKey: meta?.idempotencyKey,
+        }),
+      );
+
+      this.logger.log(`[LEDGER IN] Conta ${account.accountNumber} creditada em ${amount}. Novo saldo: ${newBalance}`);
+      return newBalance;
+    });
+  }
+
+  async calculateDailyVolume(accountId: string): Promise<number> {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const txs = await this.txRepo.createQueryBuilder('tx')
+      .where('tx.accountId = :accountId', { accountId })
+      .andWhere('tx.amount < 0')
+      .andWhere('tx.createdAt >= :today', { today })
+      .getMany();
+
+    const volume = txs.reduce((sum, tx) => sum + Math.abs(Number(tx.amount)), 0);
+    return Math.round(volume * 100);
   }
 
   /**

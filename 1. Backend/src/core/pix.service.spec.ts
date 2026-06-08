@@ -91,7 +91,7 @@ describe('PixService (Unit Tests)', () => {
       expect(mockIdempotency.acquireLock).toHaveBeenCalledWith(idempotencyKey, mockAccountId);
       expect(mockCoreService.executePixAtomic).toHaveBeenCalled();
       expect(result.status).toBe('SETTLED_SPI');
-      expect(result.amountProcessedCents).toBe(500); // 5 reais = 500 centavos
+      expect(result.amount).toBe(500); // 5 reais = 500 centavos
       expect(mockGateway.broadcastPixEvent).toHaveBeenCalledWith(
         expect.objectContaining({ type: 'PIX_OUTBOUND_SUCCESS' })
       );

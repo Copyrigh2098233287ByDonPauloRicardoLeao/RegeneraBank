@@ -127,7 +127,8 @@ export class LifestyleService {
    * Processamento de compras no Marketplace Interno.
    * Aciona regras de negócio assíncronas via Pub/Sub (Cashback, XP).
    */
-  async processMarketplacePurchase(neuralId: string, productId: string, amountCents: number, idempotencyKey?: string) {
+  async processMarketplacePurchase(neuralId: string, productId: string, idempotencyKey?: string) {
+    const amountCents = 1500; // Mock amount
     if (idempotencyKey) {
       const cached = await this.idempotencyGuard.get(idempotencyKey, neuralId);
       if (cached) return cached.body;

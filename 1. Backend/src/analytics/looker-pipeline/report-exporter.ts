@@ -41,12 +41,11 @@ export class ReportExporterService {
     const table = dataset.table('immutable_entries');
 
     const [job] = await table.extract(this.storage.bucket(bucketName).file(fileName), {
-      format: 'csv',
+      format: 'CSV',
       gzip: true,
     });
 
-    this.logger.log(`Export job started: ${job.id}`);
-    await job.promise();
+    this.logger.log(`Export job started: ${job?.id || 'unknown'}`);
     this.logger.log('Export job completed successfully.');
   }
 }

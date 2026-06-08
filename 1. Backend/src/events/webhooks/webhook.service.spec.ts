@@ -1,14 +1,14 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { WebhookService } from './webhook.service';
 import { ConfigService } from '@nestjs/config';
-import { IdempotencyRepository } from '../../core/idempotency/idempotency.repository';
+import { IdempotencyService } from '../../core/idempotency.service';
 import { PixService } from '../../core/pix.service';
 import { UnauthorizedException, BadRequestException } from '@nestjs/common';
 import { createHmac } from 'crypto';
 
 describe('WebhookService (Events)', () => {
   let webhookService: WebhookService;
-  let idempotencyMock: jest.Mocked<IdempotencyRepository>;
+  let idempotencyMock: jest.Mocked<IdempotencyService>;
   let pixServiceMock: jest.Mocked<PixService>;
   let configServiceMock: Partial<ConfigService>;
 
@@ -33,7 +33,7 @@ describe('WebhookService (Events)', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         WebhookService,
-        { provide: IdempotencyRepository, useValue: idempotencyMock },
+        { provide: IdempotencyService, useValue: idempotencyMock },
         { provide: PixService, useValue: pixServiceMock },
         { provide: ConfigService, useValue: configServiceMock },
       ],

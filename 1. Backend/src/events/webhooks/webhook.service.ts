@@ -23,7 +23,7 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 import { Injectable, Logger, UnauthorizedException, BadRequestException, Inject, forwardRef } from '@nestjs/common';
 import { createHmac, timingSafeEqual } from 'crypto';
 import { ConfigService } from '@nestjs/config';
-import { IdempotencyRepository } from '../../core/idempotency/idempotency.repository';
+import { IdempotencyService } from '../../core/idempotency.service';
 import { PixService } from '../../core/pix.service';
 
 export interface WebhookPayload {
@@ -39,7 +39,7 @@ export class WebhookService {
 
   constructor(
     private readonly config: ConfigService,
-    private readonly idempotencyGuard: IdempotencyRepository,
+    private readonly idempotencyGuard: IdempotencyService,
     @Inject(forwardRef(() => PixService))
     private readonly pixService: PixService
   ) {}
@@ -50,7 +50,7 @@ export class WebhookService {
    * 2. Valida Idempotência (Prevenção de Replay Attacks)
    * 3. Roteia para os serviços Core
    */
-  async processIncomingEvent(payload: WebhookPayload, signatureHeader: string, rawBody: string) {
+  async processIncomingEvent(payload: WebhookPayload, signatureHeader?: string, rawBody?: string) {
     if (!payload.eventId) {
       throw new BadRequestException('Payload malformado. EventId ausente.');
     }

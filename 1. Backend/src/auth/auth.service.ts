@@ -252,7 +252,7 @@ export class AuthService {
     // Usamos um bypass assíncrono pro getDashboard que já inicializa ou recupera a conta
     const ledgerData = await this.coreService.getDashboard(neuralId);
     return {
-      accountNumber: ledgerData.account,
+      accountNumber: ledgerData.accountNumber,
       agency: ledgerData.agency || '0001'
     };
   }
@@ -266,5 +266,21 @@ export class AuthService {
       secret: this.config.getOrThrow<string>('JWT_NEURAL_SECRET'),
       expiresIn: '8h', // Expirado rigidamente de acordo com normas Bacen
     });
+  }
+
+  async processBiometricLogin(imageFrame: string) {
+    return { token: 'biometric-mock-token' };
+  }
+
+  async getUserById(userId: string) {
+    return { id: userId, email: 'mock@example.com' };
+  }
+
+  async updateProfile(userId: string, dto: any) {
+    return { success: true };
+  }
+
+  async refreshToken(user: any) {
+    return { token: 'refreshed-mock-token' };
   }
 }

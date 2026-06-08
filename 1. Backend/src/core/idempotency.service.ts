@@ -27,86 +27,65 @@ import Redis from 'ioredis';
 export class IdempotencyService {
   private redis!: Redis;
   private readonly logger = new Logger(IdempotencyService.name);
-  private memoryCache = new Map<string, string>();
-  private useMemory = false;
 
   constructor() {
     try {
       this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-        maxRetriesPerRequest: 1,
-        connectTimeout: 2000,
+        maxRetriesPerRequest: 3,
+        connectTimeout: 5000,
       });
       this.redis.on('error', (err) => {
-        this.logger.warn(`Redis connection error, falling back to memory: ${err.message}`);
-        this.useMemory = true;
+        this.logger.error(`Redis connection error. Idempotency is severely degraded: ${err.message}`);
       });
     } catch (e) {
-      this.logger.warn('Failed to initialize Redis, using in-memory cache');
-      this.useMemory = true;
+      this.logger.error('Failed to initialize Redis. System cannot guarantee idempotency without it.');
+      throw new Error('Critical: Redis Initialization Failed');
     }
   }
 
-  async acquireLock(key: string, userId: string): Promise<void> {
-    const lockKey = `idempotency:${userId}:${key}`;
-    if (this.useMemory) {
-      if (this.memoryCache.has(lockKey)) {
-        throw new ConflictException('Transação já processada ou em andamento.');
-      }
-      this.memoryCache.set(lockKey, 'LOCKED');
-      return;
-    }
+  async exists(key: string): Promise<boolean> {
+    const result = await this.redis.exists(`idempotency_result:${key}`);
+    return result === 1;
+  }
 
-    try {
-      // SET NX EX 86400 (24h)
-      const result = await this.redis.set(lockKey, 'LOCKED', 'EX', 86400, 'NX');
-      if (!result) {
-        this.logger.warn(`Idempotency lock failed for key: ${key} user: ${userId}`);
-        throw new ConflictException('Transação já processada ou em andamento.');
-      }
-    } catch (e) {
-      if (e instanceof ConflictException) throw e;
-      this.logger.warn(`Redis failed to set lock, falling back to memory: ${e}`);
-      this.useMemory = true;
-      if (this.memoryCache.has(lockKey)) {
-        throw new ConflictException('Transação já processada ou em andamento.');
-      }
-      this.memoryCache.set(lockKey, 'LOCKED');
+  async lock(key: string): Promise<void> {
+    return this.acquireLock(key, 'system');
+  }
+
+  async acquireLock(key: string, neuralId: string): Promise<void> {
+    const lockKey = `idempotency_lock:${neuralId}:${key}`;
+    const result = await this.redis.set(lockKey, 'LOCKED', 'EX', 60, 'NX');
+    if (!result) {
+      this.logger.warn(`Idempotency lock failed for key: ${key}`);
+      throw new ConflictException('Transação já processada ou em andamento.');
     }
   }
 
-  async get(key: string, userId: string): Promise<any | null> {
-    const logKey = `idempotency_result:${userId}:${key}`;
-    if (this.useMemory) {
-      const cached = this.memoryCache.get(logKey);
-      return cached ? JSON.parse(cached) : null;
-    }
-
-    try {
-      const log = await this.redis.get(logKey);
-      if (log) {
-        return JSON.parse(log);
-      }
-      return null;
-    } catch (e) {
-      this.logger.warn(`Redis failed to get, falling back to memory: ${e}`);
-      this.useMemory = true;
-      const cached = this.memoryCache.get(logKey);
-      return cached ? JSON.parse(cached) : null;
-    }
+  async unlock(key: string): Promise<void> {
+    return this.releaseLock(key, 'system');
   }
 
-  async save(key: string, userId: string, endpoint: string, status: number, body: any) {
-    const logKey = `idempotency_result:${userId}:${key}`;
-    const payload = JSON.stringify({ status, body });
-    this.memoryCache.set(logKey, payload);
+  async releaseLock(key: string, neuralId: string): Promise<void> {
+    const lockKey = `idempotency_lock:${neuralId}:${key}`;
+    await this.redis.del(lockKey);
+  }
 
-    if (!this.useMemory) {
-      try {
-        await this.redis.set(logKey, payload, 'EX', 86400);
-      } catch (e) {
-        this.logger.warn(`Redis failed to save, using memory only: ${e}`);
-        this.useMemory = true;
-      }
-    }
+  async get(key: string, neuralId?: string): Promise<any | null> {
+    const logKey = neuralId ? `idempotency_result:${neuralId}:${key}` : `idempotency_result:${key}`;
+    const log = await this.redis.get(logKey);
+    return log ? JSON.parse(log) : null;
+  }
+
+  async save(key: string, param2: any, param3?: any, param4?: any, param5?: any): Promise<void> {
+    // Handling overloaded signature:
+    // save(key, body) OR save(key, neuralId, endpoint, status, body)
+    const isOverloaded = param3 !== undefined;
+    const logKey = isOverloaded ? `idempotency_result:${param2}:${key}` : `idempotency_result:${key}`;
+    const body = isOverloaded ? param5 : param2;
+    const status = isOverloaded ? param4 : 200;
+
+    const payload = JSON.stringify(isOverloaded ? { status, body } : { payload: body });
+    // Keep idempotency result for 24 hours
+    await this.redis.set(logKey, payload, 'EX', 86400);
   }
 }

@@ -49,10 +49,20 @@ import { SecurityController } from './security.controller';
 import { SecurityService } from './security.service';
 import { IdentityService } from './identity.service';
 
+import { MockPepProvider } from './providers/mock-pep.provider';
+
 @Module({
   imports: [TypeOrmModule.forFeature([AccountEntity])],
   controllers: [ComplianceController, SecurityController],
-  providers: [ComplianceService, SecurityService, IdentityService],
+  providers: [
+    ComplianceService,
+    SecurityService,
+    IdentityService,
+    {
+      provide: 'PEP_PROVIDER',
+      useClass: MockPepProvider,
+    },
+  ],
   exports: [ComplianceService, SecurityService, IdentityService],
 })
 export class ComplianceModule {}

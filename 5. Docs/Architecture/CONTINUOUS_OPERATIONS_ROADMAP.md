@@ -1,4 +1,4 @@
-# Regenera Bank Enterprise System - Day 2 Operations & Roadmap
+# Regenera Bank Enterprise System - Continuous Operations & Roadmap
 
 **Classification:** Internal / Confidential  
 **Author:** Engineering Board  
@@ -21,7 +21,7 @@ Para blindar a resiliência do *Core Banking*, a integração contínua passa a 
 
 ---
 
-## 3. Segurança Contínua e Observabilidade (Day 2)
+## 3. Segurança Contínua e Observabilidade (Continuous Operations)
 A governança sobre o ciclo de vida do software exige monitoramento ininterrupto da superfície de ataque e da saúde do *Ledger*.
 
 * **Análise Estática de Vulnerabilidades (SAST):** Integração mandatória de motores de varredura (SonarQube e Snyk) na *pipeline*. Todo o grafo de dependências NPM será escaneado contra CVEs (Common Vulnerabilities and Exposures) conhecidas.

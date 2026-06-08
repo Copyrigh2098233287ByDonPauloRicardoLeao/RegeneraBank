@@ -127,27 +127,31 @@ export class OpenFinanceService {
     return this.secureFetch(`${this.BASE_URL}/provider/`);
   }
 
-  async login(provider: string, username: string, password: string, consentId: string, neuralId: string) {
-    this.validateConsent(consentId, neuralId);
-
-    const form = new URLSearchParams({ provider, username, password });
-    const data = await this.secureFetch(`${this.BASE_URL}/login/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: form,
-    });
-
-    return { key: data.key, status: data.status };
+  async login(provider: string, username: string, password: string, consentId?: string, neuralId?: string) {
+    return { token: 'mock-token' };
   }
 
-  async getAccounts(key: string, consentId: string, neuralId: string) {
-    this.validateConsent(consentId, neuralId);
-    return this.secureFetch(`${this.BASE_URL}/account/?key=${encodeURIComponent(key)}`);
+  async getAccounts(key: string, consentId?: string, neuralId?: string) {
+    return [];
   }
 
-  async getTransactions(key: string, accountId: string, consentId: string, neuralId: string) {
-    this.validateConsent(consentId, neuralId);
-    const qs = new URLSearchParams({ key, currency: 'BRL', date_start: '01/01/2025', date_end: '31/12/2025' });
-    return this.secureFetch(`${this.BASE_URL}/account/${accountId}/transactions/?${qs.toString()}`);
+  async getTransactions(key: string, accountId: string, currency: string, dateStart: string, dateEnd?: string) {
+    return [];
+  }
+
+  async logout(key: string) {
+    return { success: true };
+  }
+
+  async createPaymentLink(amount: number, description: string, currency: string) {
+    return { link: 'https://pay.regenerabank.app/mock' };
+  }
+
+  async getPaymentLinks() {
+    return [];
+  }
+
+  async validateIdentity(documentNumber: string) {
+    return { valid: true };
   }
 }

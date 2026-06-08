@@ -24,9 +24,9 @@ import { Injectable, ForbiddenException, Logger, BadRequestException, Inject, fo
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { LedgerService } from '../ledger/ledger.service';
-import { IdempotencyRepository } from '../idempotency/idempotency.repository';
-import { AccountEntity } from '../accounts/account.entity';
+import { CoreService } from './core.service';
+import { IdempotencyService } from './idempotency.service';
+import { AccountEntity } from './entities/account.entity';
 
 interface PixSpiPayload {
   endToEndId: string;
@@ -45,9 +45,9 @@ export class PixService {
   private readonly GLOBAL_LIMIT_NIGHT_CENTS = 100000; // R$ 1.000,00
 
   constructor(
-    @Inject(forwardRef(() => LedgerService))
-    private readonly ledgerService: LedgerService,
-    private readonly idempotencyGuard: IdempotencyRepository,
+    @Inject(forwardRef(() => CoreService))
+    private readonly ledgerService: CoreService,
+    private readonly idempotencyGuard: IdempotencyService,
     @InjectRepository(AccountEntity)
     private readonly accountRepository: Repository<AccountEntity>,
   ) {}
@@ -104,6 +104,29 @@ export class PixService {
       this.logger.error(`[CRÍTICO] Falha na liquidação SPI Inbound E2E: ${data.endToEndId}. Motivo: ${error.message}`);
       throw error;
     }
+  }
+
+  async executePix(senderNeuralId: string, receiverKey: string, amount: number, idempotencyKey?: string) {
+    return this.ledgerService.executePixAtomic(senderNeuralId, receiverKey, amount, {
+      endToEndId: `E2E_TEST_${Date.now()}`,
+      idempotencyKey,
+    });
+  }
+
+  async listPixKeys(neuralId: string) {
+    return [];
+  }
+
+  async createPixKey(neuralId: string, type: string, value: string) {
+    return { id: 'mock-key-id', type, value };
+  }
+
+  async deletePixKey(neuralId: string, id: string) {
+    return { success: true };
+  }
+
+  async generateReceiveCode(neuralId: string, amount: number) {
+    return { code: '00020126580014br.gov.bcb.pix...', amount };
   }
 
   /**

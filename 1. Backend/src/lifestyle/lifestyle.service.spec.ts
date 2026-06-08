@@ -80,7 +80,7 @@ describe('LifestyleService (Dreams & Marketplace)', () => {
   describe('processMarketplacePurchase', () => {
     it('deve debitar no banco ACID e disparar evento Pub/Sub de Cashback', async () => {
       // Como o PubSub interno da classe é não-injetável de forma simples, focamos no débito
-      const result = await service.processMarketplacePurchase('usr_1', 'prod_123', 8990); // R$ 89,90
+      const result = await service.processMarketplacePurchase('usr_1', 'prod_123');
       
       expect(result.status).toBe('APPROVED');
       expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 89.9, expect.objectContaining({ type: 'MARKETPLACE_BUY' }));

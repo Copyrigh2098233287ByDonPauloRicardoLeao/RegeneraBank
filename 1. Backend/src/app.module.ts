@@ -60,7 +60,7 @@ import { HealthController } from './health.controller';
         return {
           type: 'postgres',
           url: config.getOrThrow<string>('DATABASE_URL'),
-          ssl: { rejectUnauthorized: false },
+          ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: true } : { rejectUnauthorized: false },
           autoLoadEntities: true,
           synchronize: false, // Prod ledger: tables must be created via migrations or pre-seeded structure, not auto sync
           logging: ['error', 'warn'],
