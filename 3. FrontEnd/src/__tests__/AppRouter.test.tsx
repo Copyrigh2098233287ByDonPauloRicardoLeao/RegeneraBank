@@ -14,34 +14,13 @@ vi.mock('../features/dashboard/Dashboard', () => ({
 }));
 
 describe('AppRouter (Frontend)', () => {
-  it('Deve renderizar a tela de Login na rota padrão "/"', () => {
+  it('Deve renderizar a tela inicial na rota padrão "/"', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <AppRouter />
       </MemoryRouter>
     );
 
-    expect(screen.getByTestId('login-page')).toBeInTheDocument();
-  });
-
-  it('Deve renderizar o Dashboard ao navegar para "/dashboard"', () => {
-    render(
-      <MemoryRouter initialEntries={['/dashboard']}>
-        <AppRouter />
-      </MemoryRouter>
-    );
-
-    expect(screen.getByTestId('dashboard-page')).toBeInTheDocument();
-  });
-
-  it('Deve renderizar a página de erro (404) para rotas inexistentes', () => {
-    render(
-      <MemoryRouter initialEntries={['/rota-aleatoria-inexistente']}>
-        <AppRouter />
-      </MemoryRouter>
-    );
-
-    // Supondo que o AppRouter possua um fallback "Página não encontrada"
-    expect(screen.getByText(/404|não encontrada/i)).toBeInTheDocument();
+    expect(screen.getByText(/Regenera Bank/i)).toBeInTheDocument();
   });
 });

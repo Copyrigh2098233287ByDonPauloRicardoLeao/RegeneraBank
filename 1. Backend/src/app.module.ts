@@ -56,15 +56,16 @@ import { HealthController } from './health.controller';
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
-      useFactory: (config: ConfigService) => {
+      useFactory: (config: ConfigService): any => {
         return {
-          type: 'postgres',
-          url: config.getOrThrow<string>('DATABASE_URL'),
+          type: process.env.NODE_ENV === 'test' ? 'sqlite' : 'postgres',
+          url: process.env.NODE_ENV === 'test' ? undefined : config.getOrThrow<string>('DATABASE_URL'),
+          database: process.env.NODE_ENV === 'test' ? ':memory:' : undefined,
           ssl: {
             rejectUnauthorized: process.env.NODE_ENV === 'production',
           },
           autoLoadEntities: true,
-          synchronize: false, // Prod ledger: tables must be created via migrations or pre-seeded structure, not auto sync
+          synchronize: process.env.NODE_ENV === 'test', // Prod ledger: tables must be created via migrations or pre-seeded structure, not auto sync
           logging: ['error', 'warn'],
         };
       },

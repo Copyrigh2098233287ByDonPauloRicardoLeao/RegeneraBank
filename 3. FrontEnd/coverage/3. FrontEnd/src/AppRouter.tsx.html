@@ -1,0 +1,502 @@
+
+<!doctype html>
+<html lang="en">
+
+<head>
+    <title>Code coverage report for 3. FrontEnd/src/AppRouter.tsx</title>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="../../prettify.css" />
+    <link rel="stylesheet" href="../../base.css" />
+    <link rel="shortcut icon" type="image/x-icon" href="../../favicon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style type='text/css'>
+        .coverage-summary .sorter {
+            background-image: url(../../sort-arrow-sprite.png);
+        }
+    </style>
+</head>
+    
+<body>
+<div class='wrapper'>
+    <div class='pad1'>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">3. FrontEnd/src</a> AppRouter.tsx</h1>
+        <div class='clearfix'>
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">92.8% </span>
+                <span class="quiet">Statements</span>
+                <span class='fraction'>129/139</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>0/0</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">0% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>0/2</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">92.8% </span>
+                <span class="quiet">Lines</span>
+                <span class='fraction'>129/139</span>
+            </div>
+        
+            
+        </div>
+        <p class="quiet">
+            Press <em>n</em> or <em>j</em> to go to the next uncovered block, <em>b</em>, <em>p</em> or <em>k</em> for the previous block.
+        </p>
+        <template id="filterTemplate">
+            <div class="quiet">
+                Filter:
+                <input type="search" id="fileSearch">
+            </div>
+        </template>
+    </div>
+    <div class='status-line high'></div>
+    <pre><table class="coverage">
+<tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
+<a name='L2'></a><a href='#L2'>2</a>
+<a name='L3'></a><a href='#L3'>3</a>
+<a name='L4'></a><a href='#L4'>4</a>
+<a name='L5'></a><a href='#L5'>5</a>
+<a name='L6'></a><a href='#L6'>6</a>
+<a name='L7'></a><a href='#L7'>7</a>
+<a name='L8'></a><a href='#L8'>8</a>
+<a name='L9'></a><a href='#L9'>9</a>
+<a name='L10'></a><a href='#L10'>10</a>
+<a name='L11'></a><a href='#L11'>11</a>
+<a name='L12'></a><a href='#L12'>12</a>
+<a name='L13'></a><a href='#L13'>13</a>
+<a name='L14'></a><a href='#L14'>14</a>
+<a name='L15'></a><a href='#L15'>15</a>
+<a name='L16'></a><a href='#L16'>16</a>
+<a name='L17'></a><a href='#L17'>17</a>
+<a name='L18'></a><a href='#L18'>18</a>
+<a name='L19'></a><a href='#L19'>19</a>
+<a name='L20'></a><a href='#L20'>20</a>
+<a name='L21'></a><a href='#L21'>21</a>
+<a name='L22'></a><a href='#L22'>22</a>
+<a name='L23'></a><a href='#L23'>23</a>
+<a name='L24'></a><a href='#L24'>24</a>
+<a name='L25'></a><a href='#L25'>25</a>
+<a name='L26'></a><a href='#L26'>26</a>
+<a name='L27'></a><a href='#L27'>27</a>
+<a name='L28'></a><a href='#L28'>28</a>
+<a name='L29'></a><a href='#L29'>29</a>
+<a name='L30'></a><a href='#L30'>30</a>
+<a name='L31'></a><a href='#L31'>31</a>
+<a name='L32'></a><a href='#L32'>32</a>
+<a name='L33'></a><a href='#L33'>33</a>
+<a name='L34'></a><a href='#L34'>34</a>
+<a name='L35'></a><a href='#L35'>35</a>
+<a name='L36'></a><a href='#L36'>36</a>
+<a name='L37'></a><a href='#L37'>37</a>
+<a name='L38'></a><a href='#L38'>38</a>
+<a name='L39'></a><a href='#L39'>39</a>
+<a name='L40'></a><a href='#L40'>40</a>
+<a name='L41'></a><a href='#L41'>41</a>
+<a name='L42'></a><a href='#L42'>42</a>
+<a name='L43'></a><a href='#L43'>43</a>
+<a name='L44'></a><a href='#L44'>44</a>
+<a name='L45'></a><a href='#L45'>45</a>
+<a name='L46'></a><a href='#L46'>46</a>
+<a name='L47'></a><a href='#L47'>47</a>
+<a name='L48'></a><a href='#L48'>48</a>
+<a name='L49'></a><a href='#L49'>49</a>
+<a name='L50'></a><a href='#L50'>50</a>
+<a name='L51'></a><a href='#L51'>51</a>
+<a name='L52'></a><a href='#L52'>52</a>
+<a name='L53'></a><a href='#L53'>53</a>
+<a name='L54'></a><a href='#L54'>54</a>
+<a name='L55'></a><a href='#L55'>55</a>
+<a name='L56'></a><a href='#L56'>56</a>
+<a name='L57'></a><a href='#L57'>57</a>
+<a name='L58'></a><a href='#L58'>58</a>
+<a name='L59'></a><a href='#L59'>59</a>
+<a name='L60'></a><a href='#L60'>60</a>
+<a name='L61'></a><a href='#L61'>61</a>
+<a name='L62'></a><a href='#L62'>62</a>
+<a name='L63'></a><a href='#L63'>63</a>
+<a name='L64'></a><a href='#L64'>64</a>
+<a name='L65'></a><a href='#L65'>65</a>
+<a name='L66'></a><a href='#L66'>66</a>
+<a name='L67'></a><a href='#L67'>67</a>
+<a name='L68'></a><a href='#L68'>68</a>
+<a name='L69'></a><a href='#L69'>69</a>
+<a name='L70'></a><a href='#L70'>70</a>
+<a name='L71'></a><a href='#L71'>71</a>
+<a name='L72'></a><a href='#L72'>72</a>
+<a name='L73'></a><a href='#L73'>73</a>
+<a name='L74'></a><a href='#L74'>74</a>
+<a name='L75'></a><a href='#L75'>75</a>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a>
+<a name='L93'></a><a href='#L93'>93</a>
+<a name='L94'></a><a href='#L94'>94</a>
+<a name='L95'></a><a href='#L95'>95</a>
+<a name='L96'></a><a href='#L96'>96</a>
+<a name='L97'></a><a href='#L97'>97</a>
+<a name='L98'></a><a href='#L98'>98</a>
+<a name='L99'></a><a href='#L99'>99</a>
+<a name='L100'></a><a href='#L100'>100</a>
+<a name='L101'></a><a href='#L101'>101</a>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a>
+<a name='L105'></a><a href='#L105'>105</a>
+<a name='L106'></a><a href='#L106'>106</a>
+<a name='L107'></a><a href='#L107'>107</a>
+<a name='L108'></a><a href='#L108'>108</a>
+<a name='L109'></a><a href='#L109'>109</a>
+<a name='L110'></a><a href='#L110'>110</a>
+<a name='L111'></a><a href='#L111'>111</a>
+<a name='L112'></a><a href='#L112'>112</a>
+<a name='L113'></a><a href='#L113'>113</a>
+<a name='L114'></a><a href='#L114'>114</a>
+<a name='L115'></a><a href='#L115'>115</a>
+<a name='L116'></a><a href='#L116'>116</a>
+<a name='L117'></a><a href='#L117'>117</a>
+<a name='L118'></a><a href='#L118'>118</a>
+<a name='L119'></a><a href='#L119'>119</a>
+<a name='L120'></a><a href='#L120'>120</a>
+<a name='L121'></a><a href='#L121'>121</a>
+<a name='L122'></a><a href='#L122'>122</a>
+<a name='L123'></a><a href='#L123'>123</a>
+<a name='L124'></a><a href='#L124'>124</a>
+<a name='L125'></a><a href='#L125'>125</a>
+<a name='L126'></a><a href='#L126'>126</a>
+<a name='L127'></a><a href='#L127'>127</a>
+<a name='L128'></a><a href='#L128'>128</a>
+<a name='L129'></a><a href='#L129'>129</a>
+<a name='L130'></a><a href='#L130'>130</a>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">/*
+|---------------------------------------------------------------------------------------|
+|  --&gt; REGENERA ENTERPRISE SYSTEM v4.0                                                  |
+|---------------------------------------------------------------------------------------|
+&nbsp;
+PROJECT:       Regenera Bank
+CEO:           Raphaela Cerveski
+DEVELOPER:     Don Paulo Ricardo
+ID:            2098233287
+COPYRIGHT:     Copyright (c) 2026 Regenera Corporate
+&nbsp;
+LICENSE:       EULA (End-User License Agreement)
+PROTECTION:    PROPRIEDADE INTELECTUAL RESTRITA
+&nbsp;
+WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
+               engenharia reversa ou modificação não autorizada.
+&nbsp;
+|---------------------------------------------------------------------------------------|
+|  --&gt; CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
+|---------------------------------------------------------------------------------------|
+*/
+&nbsp;
+/**
+ * @file AppRouter.tsx
+ * @description Client-side routing — React Router v6 with protected routes
+ *
+ * Route groups:
+ *   Public  — intro, login, onboarding
+ *   Private — all authenticated pages (guarded by PrivateRoute)
+ *
+ * @author    Paulo Ricardo de Leão  &lt;paulo@regenerabank.app&gt;
+ * @id        RG-2098233287
+ * @maintainer Raphaela Cerveski    &lt;ceo@regenerabank.app&gt;
+ * @copyright 2026 Regenera Corporate Ltd. — All rights reserved.
+ * @license   UNLICENSED
+ */
+&nbsp;
+import React, { Suspense, lazy } from 'react';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import { useStore } from './shared/lib/store';
+&nbsp;
+// ── Eager (small, always needed) ────────────────────────────────────────────
+import { IntroPage }    from './features/auth/ui/IntroPage';
+import { LoginPage }    from './features/auth/ui/LoginPage';
+import { HomeScreen }   from './features/banking/ui/HomeScreen';
+&nbsp;
+// ── Lazy (loaded only when the user navigates there) ─────────────────────────
+const OnboardingPage     = lazy(() =&gt; import('./features/auth/ui/OnboardingPage').then(m =&gt; ({ default: m.OnboardingPage })));
+const NeuralCorePage     = lazy(() =&gt; import('./pages/NeuralCorePage').then(m =&gt; ({ default: m.NeuralCorePage })));
+const CardsPage          = lazy(() =&gt; import('./features/cards/ui/CardsPage').then(m =&gt; ({ default: m.CardsPage })));
+const PixPage            = lazy(() =&gt; import('./features/pix/ui/PixPage').then(m =&gt; ({ default: m.PixPage })));
+const TransferPage       = lazy(() =&gt; import('./features/transfer/ui/TransferPage').then(m =&gt; ({ default: m.TransferPage })));
+const InvestmentTerminal = lazy(() =&gt; import('./features/investments/ui/InvestmentTerminal').then(m =&gt; ({ default: m.InvestmentTerminal })));
+const ProfilePage        = lazy(() =&gt; import('./features/banking/ui/ProfilePage').then(m =&gt; ({ default: m.ProfilePage })));
+const NotificationsPage  = lazy(() =&gt; import('./features/banking/ui/NotificationsPage').then(m =&gt; ({ default: m.NotificationsPage })));
+const OpenFinancePage    = lazy(() =&gt; import('./features/compliance/ui/OpenFinancePage').then(m =&gt; ({ default: m.OpenFinancePage })));
+const SecurityCenterPage = lazy(() =&gt; import('./features/compliance/ui/SecurityCenterPage').then(m =&gt; ({ default: m.SecurityCenterPage })));
+const DreamVaultPage     = lazy(() =&gt; import('./features/lifestyle/ui/DreamVaultPage').then(m =&gt; ({ default: m.DreamVaultPage })));
+const MarketplacePage    = lazy(() =&gt; import('./features/lifestyle/ui/MarketplacePage').then(m =&gt; ({ default: m.MarketplacePage })));
+const VIPLoungesPage     = lazy(() =&gt; import('./features/lifestyle/ui/VIPLoungesPage').then(m =&gt; ({ default: m.VIPLoungesPage })));
+const DocumentsPage      = lazy(() =&gt; import('./features/banking/ui/DocumentsPage').then(m =&gt; ({ default: m.DocumentsPage })));
+const TaxReportPage      = lazy(() =&gt; import('./features/banking/ui/TaxReportPage').then(m =&gt; ({ default: m.TaxReportPage })));
+const MultiCurrencyPage  = lazy(() =&gt; import('./features/banking/ui/MultiCurrencyPage').then(m =&gt; ({ default: m.MultiCurrencyPage })));
+const ETFsFunds          = lazy(() =&gt; import('./features/investments/ui/ETFsFunds').then(m =&gt; ({ default: m.ETFsFunds })));
+const FixedIncomeMarket  = lazy(() =&gt; import('./features/investments/ui/FixedIncomeMarket').then(m =&gt; ({ default: m.FixedIncomeMarket })));
+const GCPDashboard       = lazy(() =&gt; import('./features/infrastructure/ui/GCPDashboard').then(m =&gt; ({ default: m.GCPDashboard })));
+const GenerationsPage    = lazy(() =&gt; import('./features/generations/ui/GenerationsPage').then(m =&gt; ({ default: m.GenerationsPage })));
+const FaceRegistration   = lazy(() =&gt; import('./features/auth/ui/FaceRegistrationPage').then(m =&gt; ({ default: m.FaceRegistrationPage })));
+const EducationPage      = lazy(() =&gt; import('./features/education/ui/EducationPage').then(m =&gt; ({ default: m.EducationPage })));
+const EmpregosPage       = lazy(() =&gt; import('./features/careers/ui/EmpregosPage').then(m =&gt; ({ default: m.EmpregosPage })));
+const SustentabilidadePage = lazy(() =&gt; import('./features/sustainability/ui/SustentabilidadePage').then(m =&gt; ({ default: m.SustentabilidadePage })));
+&nbsp;
+// ── Guards ───────────────────────────────────────────────────────────────────
+&nbsp;
+const PrivateRoute: React.FC&lt;{ children: React.ReactElement }&gt; = <span class="fstat-no" title="function not covered" >({ children }) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >  const authenticated = useStore(s =&gt; s.isAuthenticated);</span>
+<span class="cstat-no" title="statement not covered" >  return authenticated ? children : &lt;Navigate to="/login" replace /&gt;;</span>
+<span class="cstat-no" title="statement not covered" >};</span>
+&nbsp;
+<span class="cstat-no" title="statement not covered" ><span class="fstat-no" title="function not covered" >function Loading() {</span></span>
+<span class="cstat-no" title="statement not covered" >  return (</span>
+<span class="cstat-no" title="statement not covered" >    &lt;div className="flex-1 flex items-center justify-center min-h-screen bg-[#080d1a]"&gt;</span>
+<span class="cstat-no" title="statement not covered" >      &lt;div className="w-6 h-6 border-2 border-cyan-500 border-t-transparent rounded-full animate-spin" /&gt;</span>
+<span class="cstat-no" title="statement not covered" >    &lt;/div&gt;</span>
+<span class="cstat-no" title="statement not covered" >  );</span>
+<span class="cstat-no" title="statement not covered" >}</span>
+&nbsp;
+// ── Router ───────────────────────────────────────────────────────────────────
+&nbsp;
+import { GlobalErrorBoundary } from './app/ErrorBoundary';
+&nbsp;
+// ... importações existentes ...
+&nbsp;
+export const AppRouter: React.FC = () =&gt; (
+  &lt;GlobalErrorBoundary&gt;
+    &lt;Suspense fallback={&lt;Loading /&gt;}&gt;
+      &lt;Routes&gt;
+        {/* Public */}
+        &lt;Route path="/"           element={&lt;IntroPage /&gt;} /&gt;
+        &lt;Route path="/login"      element={&lt;LoginPage /&gt;} /&gt;
+        &lt;Route path="/onboarding" element={&lt;OnboardingPage /&gt;} /&gt;
+        &lt;Route path="/onboarding/face-registration" element={&lt;FaceRegistration /&gt;} /&gt;
+&nbsp;
+        {/* Private */}
+        &lt;Route path="/home"          element={&lt;PrivateRoute&gt;&lt;HomeScreen /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/neural-core"   element={&lt;PrivateRoute&gt;&lt;NeuralCorePage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/pix"           element={&lt;PrivateRoute&gt;&lt;PixPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/transfer"      element={&lt;PrivateRoute&gt;&lt;TransferPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/cards"         element={&lt;PrivateRoute&gt;&lt;CardsPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/investments"   element={&lt;PrivateRoute&gt;&lt;InvestmentTerminal /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/fixed-income"  element={&lt;PrivateRoute&gt;&lt;FixedIncomeMarket /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/etfs-funds"    element={&lt;PrivateRoute&gt;&lt;ETFsFunds /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/security"      element={&lt;PrivateRoute&gt;&lt;SecurityCenterPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/profile"       element={&lt;PrivateRoute&gt;&lt;ProfilePage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/notifications" element={&lt;PrivateRoute&gt;&lt;NotificationsPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/open-finance"  element={&lt;PrivateRoute&gt;&lt;OpenFinancePage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/dream-vault"   element={&lt;PrivateRoute&gt;&lt;DreamVaultPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/marketplace"   element={&lt;PrivateRoute&gt;&lt;MarketplacePage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/vip-lounges"   element={&lt;PrivateRoute&gt;&lt;VIPLoungesPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/documents"     element={&lt;PrivateRoute&gt;&lt;DocumentsPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/tax-report"    element={&lt;PrivateRoute&gt;&lt;TaxReportPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/multi-currency"element={&lt;PrivateRoute&gt;&lt;MultiCurrencyPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/cloud"         element={&lt;PrivateRoute&gt;&lt;GCPDashboard /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/generations/:type" element={&lt;PrivateRoute&gt;&lt;GenerationsPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/education"     element={&lt;PrivateRoute&gt;&lt;EducationPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/educacao"      element={&lt;PrivateRoute&gt;&lt;EducationPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/careers"       element={&lt;PrivateRoute&gt;&lt;EmpregosPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/empregos"      element={&lt;PrivateRoute&gt;&lt;EmpregosPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/sustainability" element={&lt;PrivateRoute&gt;&lt;SustentabilidadePage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/sustentabilidade" element={&lt;PrivateRoute&gt;&lt;SustentabilidadePage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/concierge"     element={&lt;PrivateRoute&gt;&lt;VIPLoungesPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+        &lt;Route path="/eventos"       element={&lt;PrivateRoute&gt;&lt;VIPLoungesPage /&gt;&lt;/PrivateRoute&gt;} /&gt;
+&nbsp;
+        {/* Fallback */}
+        &lt;Route path="*" element={&lt;Navigate to="/home" replace /&gt;} /&gt;
+      &lt;/Routes&gt;
+    &lt;/Suspense&gt;
+  &lt;/GlobalErrorBoundary&gt;
+);
+&nbsp;</pre></td></tr></table></pre>
+
+                <div class='push'></div><!-- for sticky footer -->
+            </div><!-- /wrapper -->
+            <div class='footer quiet pad2 space-top1 center small'>
+                Code coverage generated by
+                <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
+                at 2026-06-08T20:35:11.759Z
+            </div>
+        <script src="../../prettify.js"></script>
+        <script>
+            window.onload = function () {
+                prettyPrint();
+            };
+        </script>
+        <script src="../../sorter.js"></script>
+        <script src="../../block-navigation.js"></script>
+    </body>
+</html>
+    
