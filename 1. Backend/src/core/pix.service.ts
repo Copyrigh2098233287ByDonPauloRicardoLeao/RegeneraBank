@@ -85,7 +85,7 @@ export class PixService {
       }
 
       // Executa o Crédito via Motor ACID do Ledger
-      await this.ledgerService.credit(receiverAccount.id, data.amountCents, {
+      await this.ledgerService.credit(receiverAccount.neuralId, data.amountCents, {
         endToEndId: data.endToEndId,
         type: 'PIX_INBOUND_SPI',
         counterpartyName: data.senderName,

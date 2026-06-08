@@ -218,17 +218,17 @@ export class CoreService implements OnModuleInit {
   /**
    * Crédito Transacional: Aumento de saldo com comprovante imutável.
    */
-  async credit(accountId: string, amountCents: number, meta?: Partial<TransactionEntity>): Promise<number> {
+  async credit(neuralId: string, amountCents: number, meta?: Partial<TransactionEntity>): Promise<number> {
     if (meta?.idempotencyKey) {
       const existing = await this.txRepo.findOne({ where: { idempotencyKey: meta.idempotencyKey } as any });
       if (existing) {
         this.logger.log(`[Idempotência] Requisão duplicada barrada no crédito: ${meta.idempotencyKey}`);
-        const acc = await this.accountRepo.findOne({ where: { id: accountId } });
+        const acc = await this.accountRepo.findOne({ where: { neuralId } });
         return acc ? Number(acc.balanceCents) / 100 : 0;
       }
     }
 
-    return this.executeAtomicOperation(accountId, async (account, queryRunner) => {
+    return this.executeAtomicOperation(neuralId, async (account, queryRunner) => {
       const balanceCents = Number(account.balanceCents);
 
       const newBalanceCents = balanceCents + amountCents;
