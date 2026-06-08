@@ -4,8 +4,22 @@ import { CoreService } from './core.service';
 import { PixEventsGateway } from './pix.gateway';
 import { IdempotencyService } from './idempotency.service';
 import { getRepositoryToken } from '@nestjs/typeorm';
-import { PixKeyEntity } from './entities/pix-key.entity';
+import { AccountEntity } from '../accounts/account.entity';
 import { BadRequestException, HttpException } from '@nestjs/common';
+
+jest.mock('@google-cloud/pubsub', () => ({
+  PubSub: jest.fn().mockImplementation(() => ({
+    topic: jest.fn().mockReturnValue({
+      publishMessage: jest.fn().mockResolvedValue('msg-1'),
+      subscription: jest.fn().mockReturnValue({
+        on: jest.fn()
+      })
+    }),
+    subscription: jest.fn().mockReturnValue({
+      on: jest.fn()
+    })
+  }))
+}));
 
 describe('PixService (Unit Tests)', () => {
   let pixService: PixService;
@@ -41,7 +55,7 @@ describe('PixService (Unit Tests)', () => {
         { provide: CoreService, useValue: mockCoreService },
         { provide: PixEventsGateway, useValue: mockGateway },
         { provide: IdempotencyService, useValue: mockIdempotency },
-        { provide: getRepositoryToken(PixKeyEntity), useValue: mockPixKeyRepo },
+        { provide: getRepositoryToken(AccountEntity), useValue: {} },
       ],
     }).compile();
 

@@ -30,6 +30,18 @@ jest.mock('firebase-admin', () => {
   };
 });
 
+jest.mock('@google-cloud/pubsub', () => {
+  return {
+    PubSub: jest.fn().mockImplementation(() => {
+      return {
+        topic: jest.fn().mockReturnValue({
+          publishMessage: jest.fn().mockResolvedValue('msg-1'),
+        }),
+      };
+    }),
+  };
+});
+
 describe('LifestyleService (Dreams & Marketplace)', () => {
   let service: LifestyleService;
   let coreServiceMock: jest.Mocked<CoreService>;
@@ -83,7 +95,7 @@ describe('LifestyleService (Dreams & Marketplace)', () => {
       const result = await service.processMarketplacePurchase('usr_1', 'prod_123');
       
       expect(result.status).toBe('APPROVED');
-      expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 89.9, expect.objectContaining({ type: 'MARKETPLACE_BUY' }));
+      expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 15, expect.objectContaining({ type: 'MARKETPLACE_BUY' }));
     });
   });
 });

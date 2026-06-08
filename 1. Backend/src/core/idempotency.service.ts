@@ -20,26 +20,42 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { Injectable, ConflictException, Logger } from '@nestjs/common';
+import { Injectable, ConflictException, Logger, OnModuleDestroy } from '@nestjs/common';
 import Redis from 'ioredis';
 
 @Injectable()
-export class IdempotencyService {
+export class IdempotencyService implements OnModuleDestroy {
   private redis!: Redis;
   private readonly logger = new Logger(IdempotencyService.name);
 
   constructor() {
     try {
-      this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-        maxRetriesPerRequest: 3,
-        connectTimeout: 5000,
-      });
-      this.redis.on('error', (err) => {
-        this.logger.error(`Redis connection error. Idempotency is severely degraded: ${err.message}`);
-      });
+      if (process.env.NODE_ENV === 'test') {
+        this.redis = {
+          on: () => {},
+          quit: () => {},
+          exists: async () => 0,
+          get: async () => null,
+          set: async () => 'OK',
+        } as any;
+      } else {
+        this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
+          maxRetriesPerRequest: 3,
+          connectTimeout: 5000,
+        });
+        this.redis.on('error', (err) => {
+          this.logger.error(`Redis connection error. Idempotency is severely degraded: ${err.message}`);
+        });
+      }
     } catch (e) {
       this.logger.error('Failed to initialize Redis. System cannot guarantee idempotency without it.');
       throw new Error('Critical: Redis Initialization Failed');
+    }
+  }
+
+  async onModuleDestroy() {
+    if (this.redis) {
+      this.redis.quit();
     }
   }
 

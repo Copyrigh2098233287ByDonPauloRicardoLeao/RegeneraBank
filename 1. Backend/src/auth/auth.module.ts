@@ -40,12 +40,28 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
 // |---------------------------------------------------------------------------------------|
 
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { NeuralAuthGuard } from './auth.guard';
 
+import { JwtModule } from '@nestjs/jwt';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { CoreModule } from '../core/core.module';
+
 @Module({
+  imports: [
+    forwardRef(() => CoreModule),
+    ConfigModule,
+    JwtModule.registerAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.getOrThrow<string>('JWT_NEURAL_SECRET'),
+        signOptions: { expiresIn: '8h' },
+      }),
+    }),
+  ],
   controllers: [AuthController],
   providers: [AuthService, NeuralAuthGuard],
   exports: [AuthService, NeuralAuthGuard],

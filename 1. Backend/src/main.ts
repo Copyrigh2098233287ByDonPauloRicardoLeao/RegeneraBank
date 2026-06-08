@@ -38,6 +38,7 @@ import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';  // Added for full OpenAPI per Guia RTF + ações imediatas (orval + contract tests)
+import helmet from 'helmet';
 
 const logger = new Logger('Bootstrap');
 
@@ -45,6 +46,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
     logger: ['error', 'warn', 'log'],
   });
+
+  app.use(helmet());
 
   // CORS must explicitly list every custom header the frontend wretch client sends on requests.
   // See src/core/api/client.ts middleware:
@@ -76,7 +79,7 @@ async function bootstrap() {
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
-      forbidNonWhitelisted: false,
+      forbidNonWhitelisted: true,
       transform: true,
       transformOptions: { enableImplicitConversion: true },
     }),

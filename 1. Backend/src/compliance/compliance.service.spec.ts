@@ -15,6 +15,7 @@ describe('ComplianceService (AML/PLD)', () => {
       providers: [
         ComplianceService,
         { provide: CoreService, useValue: coreServiceMock },
+        { provide: 'PEP_PROVIDER', useValue: { check: jest.fn().mockResolvedValue({ isPep: false }) } },
       ],
     }).compile();
 

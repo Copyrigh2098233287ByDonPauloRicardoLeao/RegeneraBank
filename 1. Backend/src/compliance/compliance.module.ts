@@ -51,8 +51,10 @@ import { IdentityService } from './identity.service';
 
 import { MockPepProvider } from './providers/mock-pep.provider';
 
+import { CoreModule } from '../core/core.module';
+
 @Module({
-  imports: [TypeOrmModule.forFeature([AccountEntity])],
+  imports: [TypeOrmModule.forFeature([AccountEntity]), CoreModule],
   controllers: [ComplianceController, SecurityController],
   providers: [
     ComplianceService,

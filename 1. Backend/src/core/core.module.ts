@@ -23,7 +23,7 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |---------------------------------------------------------------------------------------|
 // |  --> REGENERA ENTERPRISE SYSTEM v4.0                                                  |
 // |---------------------------------------------------------------------------------------|
-import { Module } from '@nestjs/common';
+import { Module, forwardRef } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CoreController } from './core.controller';
 import { CoreService } from './core.service';
@@ -40,7 +40,7 @@ import { IdempotencyLogEntity } from './entities/idempotency-log.entity';
 
 @Module({
   imports: [
-    AuthModule,
+    forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([
       UserEntity, 
       AccountEntity, 

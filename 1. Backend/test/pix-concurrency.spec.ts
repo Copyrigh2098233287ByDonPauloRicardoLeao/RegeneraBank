@@ -28,6 +28,7 @@ import { PixEventsGateway } from '../src/core/pix.gateway';
 import { PixKeyEntity } from '../src/core/entities/pix-key.entity';
 import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException } from '@nestjs/common';
+import { AccountEntity } from '../src/accounts/account.entity';
 
 describe('Pix Concurrency & Idempotency Test', () => {
   let pixService: PixService;
@@ -67,6 +68,10 @@ describe('Pix Concurrency & Idempotency Test', () => {
             create: jest.fn(),
             save: jest.fn(),
           }
+        },
+        {
+          provide: getRepositoryToken(AccountEntity),
+          useValue: {},
         },
         PixService,
       ],
