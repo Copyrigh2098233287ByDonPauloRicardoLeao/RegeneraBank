@@ -132,6 +132,9 @@ export class OpenFinanceService {
   }
 
   async getAccounts(key: string, consentId?: string, neuralId?: string) {
+    if (consentId && neuralId) {
+      this.validateConsent(consentId, neuralId);
+    }
     return [];
   }
 

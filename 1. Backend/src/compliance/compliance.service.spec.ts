@@ -15,7 +15,10 @@ describe('ComplianceService (AML/PLD)', () => {
       providers: [
         ComplianceService,
         { provide: CoreService, useValue: coreServiceMock },
-        { provide: 'PEP_PROVIDER', useValue: { check: jest.fn().mockResolvedValue({ isPep: false }) } },
+        { provide: 'PEP_PROVIDER', useValue: { check: jest.fn().mockImplementation(async (cpf) => {
+          if (cpf.endsWith('13')) return { isPep: true, score: 70 };
+          return { isPep: false, score: 10 };
+        }) } },
       ],
     }).compile();
 

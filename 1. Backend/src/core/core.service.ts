@@ -132,7 +132,7 @@ export class CoreService implements OnModuleInit {
     });
 
     return {
-      globalBalance: Number(account.balance),
+      globalBalance: Number(account.balanceCents) / 100,
       accountNumber: account.accountNumber,
       agency: account.agency,
       accountStatus: account.status,
@@ -172,7 +172,7 @@ export class CoreService implements OnModuleInit {
 
   async getBalance(neuralId: string) {
     const account = await this.getActiveAccountStrict(neuralId);
-    return { globalBalance: Number(account.balance), isLocked: account.status !== 'ACTIVE' };
+    return { globalBalance: Number(account.balanceCents) / 100, isLocked: account.status !== 'ACTIVE' };
   }
 
   /**
@@ -184,20 +184,20 @@ export class CoreService implements OnModuleInit {
       if (existing) {
         this.logger.log(`[Idempotência] Requisão duplicada barrada no dédito: ${meta.idempotencyKey}`);
         const acc = await this.getActiveAccountStrict(neuralId);
-        return Number(acc.balance);
+        return Number(acc.balanceCents) / 100;
       }
     }
 
     return this.executeAtomicOperation(neuralId, async (account, queryRunner) => {
       const amountCents = Math.round(amount * 100);
-      const balanceCents = Math.round(Number(account.balance) * 100);
+      const balanceCents = Number(account.balanceCents);
 
       if (balanceCents < amountCents) {
         throw new InsufficientFundsException();
       }
 
       const newBalance = (balanceCents - amountCents) / 100;
-      account.balance = newBalance;
+      account.balanceCents = balanceCents - amountCents;
       
       await queryRunner.manager.getRepository(AccountEntity).save(account);
 
@@ -228,16 +228,16 @@ export class CoreService implements OnModuleInit {
       if (existing) {
         this.logger.log(`[Idempotência] Requisão duplicada barrada no crédito: ${meta.idempotencyKey}`);
         const acc = await this.accountRepo.findOne({ where: { id: accountId } });
-        return acc ? Number(acc.balance) : 0;
+        return acc ? Number(acc.balanceCents) / 100 : 0;
       }
     }
 
     return this.executeAtomicOperation(accountId, async (account, queryRunner) => {
       const amountCents = Math.round(amount * 100);
-      const balanceCents = Math.round(Number(account.balance) * 100);
+      const balanceCents = Number(account.balanceCents);
 
       const newBalance = (balanceCents + amountCents) / 100;
-      account.balance = newBalance;
+      account.balanceCents = balanceCents + amountCents;
       
       await queryRunner.manager.getRepository(AccountEntity).save(account);
 
@@ -302,15 +302,15 @@ export class CoreService implements OnModuleInit {
         throw new FinancialSecurityException('Operação bloqueada. Uma das contas envolvidas está inativa.');
       }
 
-      const senderBalanceCents = Math.round(Number(sender.balance) * 100);
+      const senderBalanceCents = Number(sender.balanceCents);
       
       if (senderBalanceCents < amountCents) {
         throw new InsufficientFundsException();
       }
 
       // Liquidação
-      sender.balance = (senderBalanceCents - amountCents) / 100;
-      receiver.balance = (Math.round(Number(receiver.balance) * 100) + amountCents) / 100;
+      sender.balanceCents = senderBalanceCents - amountCents;
+      receiver.balanceCents = Number(receiver.balanceCents) + amountCents;
 
       await accountRepo.save([sender, receiver]);
 

@@ -244,7 +244,7 @@ export class NeuralCoreService implements OnModuleInit {
         }
       }
 
-      const balance = Number(account.balance);
+      const balance = Number(account.balanceCents) / 100;
       const outflowRatio = totalIncome > 0 ? totalSpending / totalIncome : totalSpending;
 
       // Risk conditions

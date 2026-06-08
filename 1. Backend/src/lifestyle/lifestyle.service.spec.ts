@@ -72,7 +72,7 @@ describe('LifestyleService (Dreams & Marketplace)', () => {
 
   describe('addFundsToDream', () => {
     it('deve debitar o saldo ACID e repassar o aporte para o Cofre de Sonho no Firestore', async () => {
-      const result = await service.addFundsToDream('usr_1', 'dream_1', 5000); // 50 reais
+      const result = await service.addFundsToDream('usr_1', 'dream_1', 5000, 'idemp-123'); // 50 reais
       
       expect(result.status).toBe('SETTLED');
       expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 50, expect.any(Object));
