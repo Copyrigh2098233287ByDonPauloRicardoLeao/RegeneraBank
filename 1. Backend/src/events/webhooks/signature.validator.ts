@@ -25,19 +25,27 @@ import * as crypto from 'crypto';
 
 @Injectable()
 export class WebhookSignatureValidator {
-  validateSignature(rawBody: Buffer, signatureHeader: string, secretKey: string): boolean {
-    if (!signatureHeader || !secretKey) throw new UnauthorizedException('Missing signature or secret');
-    
+  validateSignature(
+    rawBody: Buffer,
+    signatureHeader: string,
+    secretKey: string,
+  ): boolean {
+    if (!signatureHeader || !secretKey)
+      throw new UnauthorizedException('Missing signature or secret');
+
     const hmac = crypto.createHmac('sha256', secretKey);
     const digest = hmac.update(rawBody).digest('hex');
-    
+
     const signatureBuffer = Buffer.from(signatureHeader);
     const digestBuffer = Buffer.from(digest);
 
-    if (signatureBuffer.length !== digestBuffer.length || !crypto.timingSafeEqual(signatureBuffer, digestBuffer)) {
+    if (
+      signatureBuffer.length !== digestBuffer.length ||
+      !crypto.timingSafeEqual(signatureBuffer, digestBuffer)
+    ) {
       throw new UnauthorizedException('Invalid Webhook Signature');
     }
-    
+
     return true;
   }
 }

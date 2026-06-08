@@ -70,7 +70,9 @@ export class AuthService {
     private readonly coreService: CoreService,
   ) {
     this.firebaseApiKey = this.config.getOrThrow<string>('FIREBASE_API_KEY');
-    const firebaseProjectId = this.config.getOrThrow<string>('FIREBASE_PROJECT_ID');
+    const firebaseProjectId = this.config.getOrThrow<string>(
+      'FIREBASE_PROJECT_ID',
+    );
 
     // Google Cloud Vision para Liveness e Step-up Biometric
     this.visionClient = new ImageAnnotatorClient();
@@ -80,43 +82,59 @@ export class AuthService {
         credential: admin.credential.applicationDefault(),
         projectId: firebaseProjectId,
       });
-      this.logger.log('Identity Provider (Firebase) conectado na infraestrutura.');
+      this.logger.log(
+        'Identity Provider (Firebase) conectado na infraestrutura.',
+      );
     }
   }
 
   /**
    * Registro onboarding. Cria a identidade no IAM e atrela uma conta-corrente real no ledger ACID.
    */
-  async register(name: string, email: string, password: string): Promise<AuthResponse> {
+  async register(
+    name: string,
+    email: string,
+    password: string,
+  ): Promise<AuthResponse> {
     try {
-      const userRecord = await admin.auth().createUser({ email, password, displayName: name });
+      const userRecord = await admin
+        .auth()
+        .createUser({ email, password, displayName: name });
       const accessToken = await this.issueToken(userRecord.uid, email);
-      
+
       // Obtém ou inicializa a conta bancária ACID vinculada a este identity (Neural ID)
       const ledgerAccount = await this.resolveLedgerProfile(userRecord.uid);
 
-      this.logger.log(`[AUDIT] Nova identidade ativada: ${email} (Neural ID: ${userRecord.uid})`);
+      this.logger.log(
+        `[AUDIT] Nova identidade ativada: ${email} (Neural ID: ${userRecord.uid})`,
+      );
 
       return {
         accessToken,
-        user: { 
-          id: userRecord.uid, 
+        user: {
+          id: userRecord.uid,
           neuralId: userRecord.uid,
-          name, 
-          email, 
-          phone: '', 
-          photoURL: '', 
-          tier: 'Standard', 
-          account: ledgerAccount.accountNumber, 
+          name,
+          email,
+          phone: '',
+          photoURL: '',
+          tier: 'Standard',
+          account: ledgerAccount.accountNumber,
           agency: ledgerAccount.agency,
         },
       };
     } catch (err: any) {
       if (err.code === 'auth/email-already-exists') {
-        throw new ConflictException('Identity Claim rejeitado: E-mail em uso por outra credencial.');
+        throw new ConflictException(
+          'Identity Claim rejeitado: E-mail em uso por outra credencial.',
+        );
       }
-      this.logger.error(`[CRÍTICO] Falha na criação de identidade na infra de autenticação: ${err.message}`);
-      throw new InternalServerErrorException('Indisponibilidade momentânea na esteira de onboard.');
+      this.logger.error(
+        `[CRÍTICO] Falha na criação de identidade na infra de autenticação: ${err.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Indisponibilidade momentânea na esteira de onboard.',
+      );
     }
   }
 
@@ -133,14 +151,18 @@ export class AuthService {
       });
     } catch (error) {
       this.logger.error('Time-out no IdentityToolkit da Google Cloud', error);
-      throw new InternalServerErrorException('Sistema de login temporariamente indisponível.');
+      throw new InternalServerErrorException(
+        'Sistema de login temporariamente indisponível.',
+      );
     }
 
     const payload = await response.json();
 
     if (!response.ok || payload.error) {
       this.logger.warn(`Tentativa de login falha para ${email} - IP restrito.`);
-      throw new UnauthorizedException('Credenciais inválidas ou conta bloqueada.');
+      throw new UnauthorizedException(
+        'Credenciais inválidas ou conta bloqueada.',
+      );
     }
 
     const user = await admin.auth().getUserByEmail(email);
@@ -175,7 +197,9 @@ export class AuthService {
       const accessToken = await this.issueToken(uid, email);
       const ledgerAccount = await this.resolveLedgerProfile(uid);
 
-      this.logger.log(`[AUDIT] Step-Up Auth via Token Exchange - Identidade: ${uid}`);
+      this.logger.log(
+        `[AUDIT] Step-Up Auth via Token Exchange - Identidade: ${uid}`,
+      );
 
       return {
         accessToken,
@@ -192,8 +216,13 @@ export class AuthService {
         },
       };
     } catch (err: any) {
-      this.logger.warn('Token Exchange falhou por spoofing ou expiração.', err.message);
-      throw new UnauthorizedException('Sessão expirada. Autentique-se novamente.');
+      this.logger.warn(
+        'Token Exchange falhou por spoofing ou expiração.',
+        err.message,
+      );
+      throw new UnauthorizedException(
+        'Sessão expirada. Autentique-se novamente.',
+      );
     }
   }
 
@@ -208,11 +237,15 @@ export class AuthService {
     const base64Image = rawData.includes(',') ? rawData.split(',')[1] : rawData;
 
     try {
-      const [result] = await this.visionClient.faceDetection({ image: { content: base64Image } });
+      const [result] = await this.visionClient.faceDetection({
+        image: { content: base64Image },
+      });
       const faces = result.faceAnnotations || [];
 
       if (faces.length === 0) {
-        this.logger.warn('Spoof detectado: Nenhuma face humana encontrada no payload base64.');
+        this.logger.warn(
+          'Spoof detectado: Nenhuma face humana encontrada no payload base64.',
+        );
         return { success: false, reason: 'LIVENESS_FAILED_NO_FACE' };
       }
 
@@ -221,9 +254,13 @@ export class AuthService {
       const blurred = face.blurredLikelihood;
 
       // Threshold rígido de segurança para aprovar autenticação Liveness no IAM
-      const isApproved = confidence >= 0.70 && (blurred === 'VERY_UNLIKELY' || blurred === 'UNLIKELY');
+      const isApproved =
+        confidence >= 0.7 &&
+        (blurred === 'VERY_UNLIKELY' || blurred === 'UNLIKELY');
 
-      this.logger.log(`[BIOMETRIA] Avaliação Liveness Concluída. Confiança: ${confidence.toFixed(2)}. Spoof Likelihood: ${blurred}. Aprovado: ${isApproved}`);
+      this.logger.log(
+        `[BIOMETRIA] Avaliação Liveness Concluída. Confiança: ${confidence.toFixed(2)}. Spoof Likelihood: ${blurred}. Aprovado: ${isApproved}`,
+      );
 
       return {
         success: isApproved,
@@ -232,8 +269,12 @@ export class AuthService {
         timestamp: new Date().toISOString(),
       };
     } catch (err: any) {
-      this.logger.error(`[CRÍTICO] Motor de visão computacional indisponível: ${err.message}`);
-      throw new InternalServerErrorException('Motor biométrico inoperante. Tente novamente mais tarde.');
+      this.logger.error(
+        `[CRÍTICO] Motor de visão computacional indisponível: ${err.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Motor biométrico inoperante. Tente novamente mais tarde.',
+      );
     }
   }
 
@@ -253,15 +294,23 @@ export class AuthService {
     const ledgerData = await this.coreService.getDashboard(neuralId);
     return {
       accountNumber: ledgerData.accountNumber,
-      agency: ledgerData.agency || '0001'
+      agency: ledgerData.agency || '0001',
     };
   }
 
   private async issueToken(uid: string, email: string): Promise<string> {
-    const customClaims = await admin.auth().getUser(uid).then(u => u.customClaims).catch(() => null);
+    const customClaims = await admin
+      .auth()
+      .getUser(uid)
+      .then((u) => u.customClaims)
+      .catch(() => null);
     const role = customClaims?.role || 'user';
 
-    const payload: JwtPayload = { sub: uid, email, role: role as 'user' | 'admin' };
+    const payload: JwtPayload = {
+      sub: uid,
+      email,
+      role: role as 'user' | 'admin',
+    };
     return this.jwtService.signAsync(payload, {
       secret: this.config.getOrThrow<string>('JWT_NEURAL_SECRET'),
       expiresIn: '8h', // Expirado rigidamente de acordo com normas Bacen

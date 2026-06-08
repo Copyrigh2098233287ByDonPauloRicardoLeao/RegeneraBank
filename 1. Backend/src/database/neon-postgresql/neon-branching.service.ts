@@ -32,7 +32,7 @@ export class NeonBranchingService {
       const response = await axios.post(
         `${this.baseUrl}/projects/${this.projectId}/branches`,
         { branch: { name: branchName } },
-        { headers: { Authorization: `Bearer ${this.apiKey}` } }
+        { headers: { Authorization: `Bearer ${this.apiKey}` } },
       );
       return response.data;
     } catch (error) {
@@ -42,8 +42,11 @@ export class NeonBranchingService {
   }
 
   async deleteBranch(branchId: string) {
-    await axios.delete(`${this.baseUrl}/projects/${this.projectId}/branches/${branchId}`, {
-      headers: { Authorization: `Bearer ${this.apiKey}` },
-    });
+    await axios.delete(
+      `${this.baseUrl}/projects/${this.projectId}/branches/${branchId}`,
+      {
+        headers: { Authorization: `Bearer ${this.apiKey}` },
+      },
+    );
   }
 }

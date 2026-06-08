@@ -20,7 +20,12 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { Injectable, ConflictException, Logger, OnModuleDestroy } from '@nestjs/common';
+import {
+  Injectable,
+  ConflictException,
+  Logger,
+  OnModuleDestroy,
+} from '@nestjs/common';
 import Redis from 'ioredis';
 
 @Injectable()
@@ -39,16 +44,23 @@ export class IdempotencyService implements OnModuleDestroy {
           set: async () => 'OK',
         } as any;
       } else {
-        this.redis = new Redis(process.env.REDIS_URL || 'redis://localhost:6379', {
-          maxRetriesPerRequest: 3,
-          connectTimeout: 5000,
-        });
+        this.redis = new Redis(
+          process.env.REDIS_URL || 'redis://localhost:6379',
+          {
+            maxRetriesPerRequest: 3,
+            connectTimeout: 5000,
+          },
+        );
         this.redis.on('error', (err) => {
-          this.logger.error(`Redis connection error. Idempotency is severely degraded: ${err.message}`);
+          this.logger.error(
+            `Redis connection error. Idempotency is severely degraded: ${err.message}`,
+          );
         });
       }
     } catch (e) {
-      this.logger.error('Failed to initialize Redis. System cannot guarantee idempotency without it.');
+      this.logger.error(
+        'Failed to initialize Redis. System cannot guarantee idempotency without it.',
+      );
       throw new Error('Critical: Redis Initialization Failed');
     }
   }
@@ -87,20 +99,32 @@ export class IdempotencyService implements OnModuleDestroy {
   }
 
   async get(key: string, neuralId?: string): Promise<any | null> {
-    const logKey = neuralId ? `idempotency_result:${neuralId}:${key}` : `idempotency_result:${key}`;
+    const logKey = neuralId
+      ? `idempotency_result:${neuralId}:${key}`
+      : `idempotency_result:${key}`;
     const log = await this.redis.get(logKey);
     return log ? JSON.parse(log) : null;
   }
 
-  async save(key: string, param2: any, param3?: any, param4?: any, param5?: any): Promise<void> {
+  async save(
+    key: string,
+    param2: any,
+    param3?: any,
+    param4?: any,
+    param5?: any,
+  ): Promise<void> {
     // Handling overloaded signature:
     // save(key, body) OR save(key, neuralId, endpoint, status, body)
     const isOverloaded = param3 !== undefined;
-    const logKey = isOverloaded ? `idempotency_result:${param2}:${key}` : `idempotency_result:${key}`;
+    const logKey = isOverloaded
+      ? `idempotency_result:${param2}:${key}`
+      : `idempotency_result:${key}`;
     const body = isOverloaded ? param5 : param2;
     const status = isOverloaded ? param4 : 200;
 
-    const payload = JSON.stringify(isOverloaded ? { status, body } : { payload: body });
+    const payload = JSON.stringify(
+      isOverloaded ? { status, body } : { payload: body },
+    );
     // Keep idempotency result for 24 hours
     await this.redis.set(logKey, payload, 'EX', 86400);
   }

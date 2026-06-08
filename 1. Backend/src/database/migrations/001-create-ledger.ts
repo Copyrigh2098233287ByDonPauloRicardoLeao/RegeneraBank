@@ -20,11 +20,11 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateLedger001 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE ledger_entries (
                 id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
                 account_id UUID NOT NULL,
@@ -37,9 +37,9 @@ export class CreateLedger001 implements MigrationInterface {
             );
             CREATE INDEX idx_ledger_account_created ON ledger_entries(account_id, created_at DESC);
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP TABLE ledger_entries;`);
-    }
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE ledger_entries;`);
+  }
 }

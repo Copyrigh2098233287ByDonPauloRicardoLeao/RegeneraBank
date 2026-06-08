@@ -40,7 +40,17 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
 // |---------------------------------------------------------------------------------------|
 
-import { Controller, Post, Get, Delete, Body, Req, UseGuards, Headers, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Delete,
+  Body,
+  Req,
+  UseGuards,
+  Headers,
+  Param,
+} from '@nestjs/common';
 import { IsString, IsNumber, Min } from 'class-validator';
 import { PixService } from './pix.service';
 import { NeuralAuthGuard } from '../auth/auth.guard';
@@ -61,7 +71,12 @@ export class PixController {
     @Body() dto: TransferDto,
     @Headers('idempotency-key') idemKey: string,
   ) {
-    return this.pixService.executePix(req.user.sub, dto.key, dto.amount, idemKey);
+    return this.pixService.executePix(
+      req.user.sub,
+      dto.key,
+      dto.amount,
+      idemKey,
+    );
   }
 
   // Real chaves management for "Minhas Chaves" tab (per spec)
@@ -71,7 +86,10 @@ export class PixController {
   }
 
   @Post('keys')
-  async createKey(@Req() req: any, @Body() dto: { type: string; value: string }) {
+  async createKey(
+    @Req() req: any,
+    @Body() dto: { type: string; value: string },
+  ) {
     return this.pixService.createPixKey(req.user.sub, dto.type, dto.value);
   }
 

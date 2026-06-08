@@ -40,7 +40,12 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
 // |---------------------------------------------------------------------------------------|
 
-import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
 
@@ -50,7 +55,9 @@ import { Logger } from '@nestjs/common';
  * Cedro Crystal feed and fan-out to connected clients.
  */
 @WebSocketGateway({ namespace: '/market-data', cors: true })
-export class TradingGateway implements OnGatewayConnection, OnGatewayDisconnect {
+export class TradingGateway
+  implements OnGatewayConnection, OnGatewayDisconnect
+{
   @WebSocketServer() server: Server;
   private readonly logger = new Logger(TradingGateway.name);
   private intervals = new Map<string, NodeJS.Timeout>();
@@ -61,7 +68,9 @@ export class TradingGateway implements OnGatewayConnection, OnGatewayDisconnect 
     // Backend uses Cloud Pub/Sub for fanout in prod.
     const iv = setInterval(async () => {
       try {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl');
+        const res = await fetch(
+          'https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=brl',
+        );
         const json = await res.json();
         // For demo, push BTC/ETH real; for stocks like PETR4 frontend can use other.
         client.emit('stock_update', {

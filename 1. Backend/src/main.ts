@@ -37,7 +37,7 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe, Logger, VersioningType } from '@nestjs/common';
 import { AppModule } from './app.module';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';  // Added for full OpenAPI per Guia RTF + ações imediatas (orval + contract tests)
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'; // Added for full OpenAPI per Guia RTF + ações imediatas (orval + contract tests)
 import helmet from 'helmet';
 
 const logger = new Logger('Bootstrap');
@@ -90,10 +90,15 @@ async function bootstrap() {
   // JSON for orval (and e2e/contract tests): /v1/api-docs-json
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Regenera Bank v4 API')
-    .setDescription('Plataforma bancária com Open Finance (Prometeo), IA Raphaela (Gemini), PIX idempotente, liveness step-up, Cloud Run Admin, ledger ACID. Contratos exatos do Guia RTF.')
+    .setDescription(
+      'Plataforma bancária com Open Finance (Prometeo), IA Raphaela (Gemini), PIX idempotente, liveness step-up, Cloud Run Admin, ledger ACID. Contratos exatos do Guia RTF.',
+    )
     .setVersion('4.0.0')
     .addBearerAuth()
-    .addApiKey({ type: 'apiKey', name: 'Idempotency-Key', in: 'header' }, 'Idempotency-Key')
+    .addApiKey(
+      { type: 'apiKey', name: 'Idempotency-Key', in: 'header' },
+      'Idempotency-Key',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('api-docs', app, document);
@@ -108,7 +113,9 @@ async function bootstrap() {
 
   const port = Number(process.env.PORT ?? 8080);
   await app.listen(port, '0.0.0.0');
-  logger.log(`Regenera Bank Core API running on :${port} [${process.env.NODE_ENV ?? 'development'}]`);
+  logger.log(
+    `Regenera Bank Core API running on :${port} [${process.env.NODE_ENV ?? 'development'}]`,
+  );
 
   // Graceful shutdown
   process.on('SIGTERM', async () => {

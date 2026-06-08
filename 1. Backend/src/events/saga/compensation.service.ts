@@ -27,10 +27,15 @@ export class CompensationService {
   private readonly logger = new Logger(CompensationService.name);
 
   async rollback(data: any, failedStep: string) {
-    this.logger.warn(`Compensating failure at ${failedStep} for user ${data.userId}`);
-    
+    this.logger.warn(
+      `Compensating failure at ${failedStep} for user ${data.userId}`,
+    );
+
     // Logic for returning reserved balance
-    if (failedStep === 'EXTERNAL_SETTLEMENT' || failedStep === 'LEDGER_CONFIRMATION') {
+    if (
+      failedStep === 'EXTERNAL_SETTLEMENT' ||
+      failedStep === 'LEDGER_CONFIRMATION'
+    ) {
       this.logger.log(`Releasing reserved balance of ${data.amount}`);
       // await ledgerService.releaseReservation(data.id);
     }

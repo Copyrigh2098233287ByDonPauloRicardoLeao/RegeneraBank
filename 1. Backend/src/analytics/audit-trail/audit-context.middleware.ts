@@ -36,7 +36,7 @@ export class AuditMetadataMiddleware implements NestMiddleware {
 
     // Anexamos o contexto ao request para ser capturado pelo SecurityAuditService
     (req as any).auditContext = auditContext;
-    
+
     next();
   }
 }

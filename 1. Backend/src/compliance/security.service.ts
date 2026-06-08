@@ -83,8 +83,13 @@ export class SecurityService {
     return { status: 'BLOCKED', neuralId, timestamp: new Date().toISOString() };
   }
 
-  async triggerSOS(neuralId: string, body: { reason?: string; location?: string }) {
-    this.logger.warn(`SOS Senior triggered for ${neuralId}: ${body.reason || 'emergency'} at ${body.location || 'unknown'}`);
+  async triggerSOS(
+    neuralId: string,
+    body: { reason?: string; location?: string },
+  ) {
+    this.logger.warn(
+      `SOS Senior triggered for ${neuralId}: ${body.reason || 'emergency'} at ${body.location || 'unknown'}`,
+    );
 
     // Real motor: publish to 'emergency-events' topic (like pix-events) for family/support handlers, FCM push, etc.
     // For now, log + return; in full, use PubSubClient like in pix.service.
@@ -95,7 +100,7 @@ export class SecurityService {
       neuralId,
       timestamp: new Date().toISOString(),
       notified: ['family', 'support'],
-      details: body
+      details: body,
     };
   }
 }

@@ -20,7 +20,12 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { Injectable, OnModuleInit, OnModuleDestroy, Logger } from '@nestjs/common';
+import {
+  Injectable,
+  OnModuleInit,
+  OnModuleDestroy,
+  Logger,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PubSub } from '@google-cloud/pubsub';
 
@@ -34,7 +39,9 @@ export class PubSubClient implements OnModuleInit, OnModuleDestroy {
   async onModuleInit() {
     this.logger.log('Initializing GCP Pub/Sub Client...');
     const projectId = this.configService.get<string>('GCP_PROJECT_ID');
-    const credentialsPath = this.configService.get<string>('GOOGLE_APPLICATION_CREDENTIALS');
+    const credentialsPath = this.configService.get<string>(
+      'GOOGLE_APPLICATION_CREDENTIALS',
+    );
 
     this.client = new PubSub({
       projectId,

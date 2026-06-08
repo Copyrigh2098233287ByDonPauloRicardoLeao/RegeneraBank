@@ -193,7 +193,14 @@
 <a name='L128'></a><a href='#L128'>128</a>
 <a name='L129'></a><a href='#L129'>129</a>
 <a name='L130'></a><a href='#L130'>130</a>
-<a name='L131'></a><a href='#L131'>131</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -290,6 +297,11 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -304,6 +316,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -362,7 +376,7 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 <span class="cstat-no" title="statement not covered" >import { NestFactory } from '@nestjs/core';</span>
 <span class="cstat-no" title="statement not covered" >import { ValidationPipe, Logger, VersioningType } from '@nestjs/common';</span>
 <span class="cstat-no" title="statement not covered" >import { AppModule } from './app.module';</span>
-<span class="cstat-no" title="statement not covered" >import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'; </span> // Added for full OpenAPI per Guia RTF + ações imediatas (orval + contract tests)
+<span class="cstat-no" title="statement not covered" >import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'; </span>// Added for full OpenAPI per Guia RTF + ações imediatas (orval + contract tests)
 <span class="cstat-no" title="statement not covered" >import helmet from 'helmet';</span>
 &nbsp;
 const logger = <span class="cstat-no" title="statement not covered" >new Logger('Bootstrap');</span>
@@ -415,10 +429,15 @@ async function <span class="fstat-no" title="function not covered" >bootstrap(</
   // JSON for orval (and e2e/contract tests): /v1/api-docs-json
   const swaggerConfig = <span class="cstat-no" title="statement not covered" >new DocumentBuilder()</span>
     .setTitle('Regenera Bank v4 API')
-    .setDescription('Plataforma bancária com Open Finance (Prometeo), IA Raphaela (Gemini), PIX idempotente, liveness step-up, Cloud Run Admin, ledger ACID. Contratos exatos do Guia RTF.')
+    .setDescription(
+      'Plataforma bancária com Open Finance (Prometeo), IA Raphaela (Gemini), PIX idempotente, liveness step-up, Cloud Run Admin, ledger ACID. Contratos exatos do Guia RTF.',
+    )
     .setVersion('4.0.0')
     .addBearerAuth()
-    .addApiKey({ type: 'apiKey', name: 'Idempotency-Key', in: 'header' }, 'Idempotency-Key')
+    .addApiKey(
+      { type: 'apiKey', name: 'Idempotency-Key', in: 'header' },
+      'Idempotency-Key',
+    )
     .build();
   const document = <span class="cstat-no" title="statement not covered" >SwaggerModule.createDocument(app, swaggerConfig);</span>
 <span class="cstat-no" title="statement not covered" >  SwaggerModule.setup('api-docs', app, document);</span>
@@ -433,7 +452,9 @@ async function <span class="fstat-no" title="function not covered" >bootstrap(</
 &nbsp;
   const port = <span class="cstat-no" title="statement not covered" >Number(process.env.PORT ?? 8080);</span>
 <span class="cstat-no" title="statement not covered" >  await app.listen(port, '0.0.0.0');</span>
-<span class="cstat-no" title="statement not covered" >  logger.log(`Regenera Bank Core API running on :${port} [${process.env.NODE_ENV ?? 'development'}]`);</span>
+<span class="cstat-no" title="statement not covered" >  logger.log(</span>
+    `Regenera Bank Core API running on :${port} [${process.env.NODE_ENV ?? 'development'}]`,
+  );
 &nbsp;
   // Graceful shutdown
 <span class="cstat-no" title="statement not covered" >  process.on('SIGTERM', <span class="fstat-no" title="function not covered" >async </span>() =&gt; {</span>
@@ -460,7 +481,7 @@ async function <span class="fstat-no" title="function not covered" >bootstrap(</
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-08T20:37:33.419Z
+                at 2026-06-08T20:47:23.773Z
             </div>
         <script src="../../prettify.js"></script>
         <script>

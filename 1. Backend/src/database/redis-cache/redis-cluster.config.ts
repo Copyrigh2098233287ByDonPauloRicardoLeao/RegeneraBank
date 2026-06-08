@@ -22,18 +22,21 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 
 import Redis from 'ioredis';
 
-export const redisClient = new Redis.Cluster([
+export const redisClient = new Redis.Cluster(
+  [
+    {
+      host: process.env.REDIS_HOST,
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+    },
+  ],
   {
-    host: process.env.REDIS_HOST,
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-  }
-], {
-  redisOptions: {
-    password: process.env.REDIS_PASSWORD,
-    tls: process.env.NODE_ENV === 'production' ? {} : undefined,
+    redisOptions: {
+      password: process.env.REDIS_PASSWORD,
+      tls: process.env.NODE_ENV === 'production' ? {} : undefined,
+    },
+    scaleReads: 'slave',
   },
-  scaleReads: 'slave',
-});
+);
 
 redisClient.on('connect', () => console.log('Redis Cluster Connected'));
 redisClient.on('error', (err) => console.error('Redis Cluster Error:', err));

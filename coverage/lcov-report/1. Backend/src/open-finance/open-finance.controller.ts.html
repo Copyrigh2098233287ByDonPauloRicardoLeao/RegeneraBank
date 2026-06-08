@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">46.15% </span>
+                <span class="strong">44.44% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>12/26</span>
+                <span class='fraction'>12/27</span>
             </div>
         
             
@@ -193,7 +193,18 @@
 <a name='L128'></a><a href='#L128'>128</a>
 <a name='L129'></a><a href='#L129'>129</a>
 <a name='L130'></a><a href='#L130'>130</a>
-<a name='L131'></a><a href='#L131'>131</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L131'></a><a href='#L131'>131</a>
+<a name='L132'></a><a href='#L132'>132</a>
+<a name='L133'></a><a href='#L133'>133</a>
+<a name='L134'></a><a href='#L134'>134</a>
+<a name='L135'></a><a href='#L135'>135</a>
+<a name='L136'></a><a href='#L136'>136</a>
+<a name='L137'></a><a href='#L137'>137</a>
+<a name='L138'></a><a href='#L138'>138</a>
+<a name='L139'></a><a href='#L139'>139</a>
+<a name='L140'></a><a href='#L140'>140</a>
+<a name='L141'></a><a href='#L141'>141</a>
+<a name='L142'></a><a href='#L142'>142</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -269,6 +280,8 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -296,8 +309,6 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -306,6 +317,16 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -319,6 +340,7 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -397,7 +419,9 @@ export class OpenFinanceController {
 <span class="fstat-no" title="function not covered" >  connect(</span>@Body() body: ConnectDto) {
     const { provider, username, password } = <span class="cstat-no" title="statement not covered" >body;</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!provider || !username || !password) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new BadRequestException('provider, username and password are required');</span>
+<span class="cstat-no" title="statement not covered" >      throw new BadRequestException(</span>
+        'provider, username and password are required',
+      );
     }
 <span class="cstat-no" title="statement not covered" >    return this.svc.login(provider, username, password);</span>
   }
@@ -420,7 +444,13 @@ export class OpenFinanceController {
     @Query('date_start') dateStart = <span class="branch-0 cbranch-no" title="branch not covered" >'01/01/2025',</span>
     @Query('date_end') dateEnd = <span class="branch-0 cbranch-no" title="branch not covered" >'31/12/2025',</span>
   ) {
-<span class="cstat-no" title="statement not covered" >    return this.svc.getTransactions(key, accountId, currency, dateStart, dateEnd);</span>
+<span class="cstat-no" title="statement not covered" >    return this.svc.getTransactions(</span>
+      key,
+      accountId,
+      currency,
+      dateStart,
+      dateEnd,
+    );
   }
 &nbsp;
   /** DELETE /v1/open-finance/disconnect?key=SESSION_KEY */
@@ -434,7 +464,9 @@ export class OpenFinanceController {
 &nbsp;
   /** POST /v1/open-finance/payment-links { amount, description?, currency? } */
   @Post('payment-links')
-<span class="fstat-no" title="function not covered" >  createPaymentLink(</span>@Body() body: { amount: number; description?: string; currency?: string }) {
+<span class="fstat-no" title="function not covered" >  createPaymentLink(</span>
+    @Body() body: { amount: number; description?: string; currency?: string },
+  ) {
     const { amount, description, currency } = <span class="cstat-no" title="statement not covered" >body;</span>
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!amount) <span class="cstat-no" title="statement not covered" >throw new BadRequestException('amount is required');</span></span>
 <span class="cstat-no" title="statement not covered" >    return this.svc.createPaymentLink(amount, description, currency);</span>
@@ -449,7 +481,8 @@ export class OpenFinanceController {
   /** POST /v1/open-finance/validate-identity { document_number } */
   @Post('validate-identity')
 <span class="fstat-no" title="function not covered" >  validateIdentity(</span>@Body() body: { document_number: string }) {
-<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!body.document_number) <span class="cstat-no" title="statement not covered" >throw new BadRequestException('document_number is required');</span></span>
+<span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!body.document_number)</span>
+<span class="cstat-no" title="statement not covered" >      throw new BadRequestException('document_number is required');</span>
 <span class="cstat-no" title="statement not covered" >    return this.svc.validateIdentity(body.document_number);</span>
   }
 }
@@ -460,7 +493,7 @@ export class OpenFinanceController {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-08T20:37:33.419Z
+                at 2026-06-08T20:47:23.773Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

@@ -40,7 +40,12 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
 // |---------------------------------------------------------------------------------------|
 
-import { WebSocketGateway, WebSocketServer, OnGatewayConnection, OnGatewayDisconnect } from '@nestjs/websockets';
+import {
+  WebSocketGateway,
+  WebSocketServer,
+  OnGatewayConnection,
+  OnGatewayDisconnect,
+} from '@nestjs/websockets';
 import { OnModuleInit } from '@nestjs/common';
 import { Server, Socket } from 'socket.io';
 import { Logger } from '@nestjs/common';
@@ -52,11 +57,15 @@ import { PubSub } from '@google-cloud/pubsub';
  * Production: subscribe to Pub/Sub 'pix-events' topic and fan-out via socket.
  */
 @WebSocketGateway({ namespace: '/pix-events', cors: true })
-export class PixEventsGateway implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit {
+export class PixEventsGateway
+  implements OnGatewayConnection, OnGatewayDisconnect, OnModuleInit
+{
   @WebSocketServer() server: Server;
   private readonly logger = new Logger(PixEventsGateway.name);
   private connectedClients = new Set<string>();
-  private pubsub = new PubSub({ projectId: process.env.GCP_PROJECT_ID || 'regenera-bank-prod' });
+  private pubsub = new PubSub({
+    projectId: process.env.GCP_PROJECT_ID || 'regenera-bank-prod',
+  });
 
   handleConnection(client: Socket) {
     this.connectedClients.add(client.id);
@@ -70,14 +79,18 @@ export class PixEventsGateway implements OnGatewayConnection, OnGatewayDisconnec
   }
 
   async onModuleInit() {
-    this.logger.log('Setting up Pub/Sub subscription for pix-events fanout to socket...');
+    this.logger.log(
+      'Setting up Pub/Sub subscription for pix-events fanout to socket...',
+    );
     const topicName = 'pix-events';
     const subscriptionName = 'pix-events-socket-sub';
 
     try {
       let subscription;
       try {
-        [subscription] = await this.pubsub.topic(topicName).createSubscription(subscriptionName);
+        [subscription] = await this.pubsub
+          .topic(topicName)
+          .createSubscription(subscriptionName);
       } catch {
         subscription = this.pubsub.subscription(subscriptionName);
       }
@@ -101,7 +114,10 @@ export class PixEventsGateway implements OnGatewayConnection, OnGatewayDisconnec
 
       this.logger.log(`Subscribed to ${topicName} for socket fanout.`);
     } catch (e) {
-      this.logger.warn('Could not setup pubsub sub for pix (may need topic created or perms): ' + (e as Error).message);
+      this.logger.warn(
+        'Could not setup pubsub sub for pix (may need topic created or perms): ' +
+          (e as Error).message,
+      );
     }
   }
 

@@ -31,7 +31,7 @@ export class UserMetricsAggregator {
 
   async aggregateDailyEngagement() {
     this.logger.log('Starting Daily Engagement Aggregation...');
-    
+
     const query = `
       INSERT INTO \`regenera_analytics.daily_engagement\`
       (event_date, active_users, total_sessions)

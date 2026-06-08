@@ -49,9 +49,12 @@ import axios from 'axios';
 @Injectable()
 export class IdentityService {
   private readonly logger = new Logger(IdentityService.name);
-  
-  private readonly PROMETEO_API_KEY = process.env.PROMETEO_API_KEY || 'CuI6HgmMnoprLdyoHPrugQVUTiih0rxMOkxB0JlcWViFAma8N72orDMYsrI7j7Ve';
-  private readonly PROMETEO_BASE_URL = 'https://banking.sandbox.prometeoapi.com'; // Adjust to actual Identity URL if different
+
+  private readonly PROMETEO_API_KEY =
+    process.env.PROMETEO_API_KEY ||
+    'CuI6HgmMnoprLdyoHPrugQVUTiih0rxMOkxB0JlcWViFAma8N72orDMYsrI7j7Ve';
+  private readonly PROMETEO_BASE_URL =
+    'https://banking.sandbox.prometeoapi.com'; // Adjust to actual Identity URL if different
 
   async validateCpf(cpf: string) {
     this.logger.log(`Validating KYC for CPF via Prometeo: ${cpf}`);
@@ -64,36 +67,38 @@ export class IdentityService {
             'X-API-Key': this.PROMETEO_API_KEY,
           },
           params: {
-             document_number: cpf
-          }
-        }
+            document_number: cpf,
+          },
+        },
       );
 
       if (response.data && response.data.data && response.data.data.Result) {
-         return response.data;
+        return response.data;
       } else {
-         throw new Error('Invalid CPF response from Prometeo');
+        throw new Error('Invalid CPF response from Prometeo');
       }
-
     } catch (error) {
       this.logger.error('Prometeo Identity API Integration Error', error);
-      
+
       // Fallback for Sandbox/Demonstration purposes
       if (cpf === '12345678909') {
-         return {
-            data: {
-              Result: {
-                BasicData: {
-                  TaxIdNumber: 12345678909,
-                  TaxIdCountry: "BR",
-                  Name: "DON PAULO RICARDO",
-                  Gender: "M"
-                }
-              }
-            }
-         };
+        return {
+          data: {
+            Result: {
+              BasicData: {
+                TaxIdNumber: 12345678909,
+                TaxIdCountry: 'BR',
+                Name: 'DON PAULO RICARDO',
+                Gender: 'M',
+              },
+            },
+          },
+        };
       }
-      throw new HttpException('Falha na validação de identidade (KYC)', HttpStatus.BAD_REQUEST);
+      throw new HttpException(
+        'Falha na validação de identidade (KYC)',
+        HttpStatus.BAD_REQUEST,
+      );
     }
   }
 }

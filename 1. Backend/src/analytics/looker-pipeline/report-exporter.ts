@@ -33,17 +33,21 @@ export class ReportExporterService {
 
   async exportMonthlyRegulatoryReport(month: string) {
     const fileName = `regulatory-reports/REGENERA_MONTHLY_${month}.csv`;
-    const bucketName = process.env.REPORTS_BUCKET || 'regenera-internal-reports';
+    const bucketName =
+      process.env.REPORTS_BUCKET || 'regenera-internal-reports';
 
     this.logger.log(`Exporting report to gs://${bucketName}/${fileName}`);
 
     const dataset = this.bq.getDataset('regenera_ledger');
     const table = dataset.table('immutable_entries');
 
-    const [job] = await table.extract(this.storage.bucket(bucketName).file(fileName), {
-      format: 'CSV',
-      gzip: true,
-    });
+    const [job] = await table.extract(
+      this.storage.bucket(bucketName).file(fileName),
+      {
+        format: 'CSV',
+        gzip: true,
+      },
+    );
 
     this.logger.log(`Export job started: ${job?.id || 'unknown'}`);
     this.logger.log('Export job completed successfully.');

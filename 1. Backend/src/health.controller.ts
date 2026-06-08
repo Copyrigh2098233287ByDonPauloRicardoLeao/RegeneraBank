@@ -41,11 +41,12 @@ const STARTED_AT = new Date();
 
 @Controller('health')
 export class HealthController {
-
   @Get()
   @HttpCode(HttpStatus.OK)
   check() {
-    const uptimeSeconds = Math.floor((Date.now() - STARTED_AT.getTime()) / 1000);
+    const uptimeSeconds = Math.floor(
+      (Date.now() - STARTED_AT.getTime()) / 1000,
+    );
 
     return {
       status: 'UP',

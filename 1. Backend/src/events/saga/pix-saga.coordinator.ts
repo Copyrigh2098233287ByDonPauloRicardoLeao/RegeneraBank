@@ -30,7 +30,7 @@ export class PixSagaCoordinator {
 
   constructor(
     private registry: SagaStepsRegistry,
-    private compensation: CompensationService
+    private compensation: CompensationService,
   ) {}
 
   async orchestratePixTransfer(transactionData: any) {
@@ -42,7 +42,9 @@ export class PixSagaCoordinator {
         this.logger.debug(`Executing step: ${step.name}`);
         await step.execute(transactionData);
       } catch (error) {
-        this.logger.error(`Saga failed at step ${step.name}. Triggering compensation...`);
+        this.logger.error(
+          `Saga failed at step ${step.name}. Triggering compensation...`,
+        );
         await this.compensation.rollback(transactionData, step.name);
         throw error;
       }

@@ -40,7 +40,15 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
 // |---------------------------------------------------------------------------------------|
 
-import { Controller, Get, Post, Body, Req, UseGuards, Headers } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  UseGuards,
+  Headers,
+} from '@nestjs/common';
 import { IsString, IsNumber, Min, IsOptional } from 'class-validator';
 import { LifestyleService } from './lifestyle.service';
 import { NeuralAuthGuard } from '../auth/auth.guard';
@@ -68,7 +76,12 @@ export class LifestyleController {
     @Headers('idempotency-key') headerIdemKey?: string,
   ) {
     const idemKey = headerIdemKey || dto.idempotencyKey;
-    return this.lifestyleService.addFundsToDream(req.user.sub, dto.dreamId, dto.amount, idemKey);
+    return this.lifestyleService.addFundsToDream(
+      req.user.sub,
+      dto.dreamId,
+      dto.amount,
+      idemKey,
+    );
   }
 
   @Post('marketplace/buy')
@@ -78,7 +91,11 @@ export class LifestyleController {
     @Headers('idempotency-key') headerIdemKey?: string,
   ) {
     const idemKey = headerIdemKey || dto.idempotencyKey;
-    return this.lifestyleService.processMarketplacePurchase(req.user.sub, dto.productId, idemKey);
+    return this.lifestyleService.processMarketplacePurchase(
+      req.user.sub,
+      dto.productId,
+      idemKey,
+    );
   }
 
   @Get('dream-vault')

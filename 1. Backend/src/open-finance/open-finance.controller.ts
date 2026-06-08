@@ -72,7 +72,9 @@ export class OpenFinanceController {
   connect(@Body() body: ConnectDto) {
     const { provider, username, password } = body;
     if (!provider || !username || !password) {
-      throw new BadRequestException('provider, username and password are required');
+      throw new BadRequestException(
+        'provider, username and password are required',
+      );
     }
     return this.svc.login(provider, username, password);
   }
@@ -95,7 +97,13 @@ export class OpenFinanceController {
     @Query('date_start') dateStart = '01/01/2025',
     @Query('date_end') dateEnd = '31/12/2025',
   ) {
-    return this.svc.getTransactions(key, accountId, currency, dateStart, dateEnd);
+    return this.svc.getTransactions(
+      key,
+      accountId,
+      currency,
+      dateStart,
+      dateEnd,
+    );
   }
 
   /** DELETE /v1/open-finance/disconnect?key=SESSION_KEY */
@@ -109,7 +117,9 @@ export class OpenFinanceController {
 
   /** POST /v1/open-finance/payment-links { amount, description?, currency? } */
   @Post('payment-links')
-  createPaymentLink(@Body() body: { amount: number; description?: string; currency?: string }) {
+  createPaymentLink(
+    @Body() body: { amount: number; description?: string; currency?: string },
+  ) {
     const { amount, description, currency } = body;
     if (!amount) throw new BadRequestException('amount is required');
     return this.svc.createPaymentLink(amount, description, currency);
@@ -124,7 +134,8 @@ export class OpenFinanceController {
   /** POST /v1/open-finance/validate-identity { document_number } */
   @Post('validate-identity')
   validateIdentity(@Body() body: { document_number: string }) {
-    if (!body.document_number) throw new BadRequestException('document_number is required');
+    if (!body.document_number)
+      throw new BadRequestException('document_number is required');
     return this.svc.validateIdentity(body.document_number);
   }
 }

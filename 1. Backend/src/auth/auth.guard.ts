@@ -40,7 +40,12 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
 // |---------------------------------------------------------------------------------------|
 
-import { CanActivate, ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as admin from 'firebase-admin';
 
@@ -58,7 +63,9 @@ export class NeuralAuthGuard implements CanActivate {
     const [type, token] = authHeader.split(' ');
 
     if (type !== 'Bearer' || !token) {
-      throw new UnauthorizedException('Protocolo Neural ou Firebase IdToken ausente.');
+      throw new UnauthorizedException(
+        'Protocolo Neural ou Firebase IdToken ausente.',
+      );
     }
 
     try {
@@ -76,7 +83,9 @@ export class NeuralAuthGuard implements CanActivate {
         request.user = await this.jwtService.verifyAsync(token);
         return true;
       } catch (jwtError: any) {
-        throw new UnauthorizedException(`Autenticação falhou: Firebase IdToken ou Token local inválidos. Erro Firebase: ${firebaseError.message}`);
+        throw new UnauthorizedException(
+          `Autenticação falhou: Firebase IdToken ou Token local inválidos. Erro Firebase: ${firebaseError.message}`,
+        );
       }
     }
   }

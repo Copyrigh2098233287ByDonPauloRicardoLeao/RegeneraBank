@@ -49,27 +49,43 @@ import axios from 'axios';
 @Injectable()
 export class PaymentLinksService {
   private readonly logger = new Logger(PaymentLinksService.name);
-  
-  private readonly PROMETEO_API_KEY = process.env.PROMETEO_API_KEY; // from Secret Manager only - never hardcoded
-  private readonly PROMETEO_BASE_URL = 'https://banking.sandbox.prometeoapi.com';
 
-  async createPaymentLink(neuralId: string, amount: number, description?: string) {
-    this.logger.log(`Creating Payment Link via Prometeo for ${neuralId}: R$ ${amount}`);
+  private readonly PROMETEO_API_KEY = process.env.PROMETEO_API_KEY; // from Secret Manager only - never hardcoded
+  private readonly PROMETEO_BASE_URL =
+    'https://banking.sandbox.prometeoapi.com';
+
+  async createPaymentLink(
+    neuralId: string,
+    amount: number,
+    description?: string,
+  ) {
+    this.logger.log(
+      `Creating Payment Link via Prometeo for ${neuralId}: R$ ${amount}`,
+    );
 
     if (!this.PROMETEO_API_KEY) {
-      throw new Error('PROMETEO_API_KEY must come from Secret Manager (injected in Cloud Run)');
+      throw new Error(
+        'PROMETEO_API_KEY must come from Secret Manager (injected in Cloud Run)',
+      );
     }
     try {
       // Real Prometeo call (key from SM)
       const response = await axios.post(
         `${this.PROMETEO_BASE_URL}/payment-links/`,
-        { amount, description: description || 'Regenera Link', currency: 'BRL' },
-        { headers: { 'X-API-Key': this.PROMETEO_API_KEY } }
+        {
+          amount,
+          description: description || 'Regenera Link',
+          currency: 'BRL',
+        },
+        { headers: { 'X-API-Key': this.PROMETEO_API_KEY } },
       );
       return response.data;
     } catch (error) {
       this.logger.error('Prometeo Payment Links API Integration Error', error);
-      throw new HttpException('Falha ao gerar link de pagamento.', HttpStatus.INTERNAL_SERVER_ERROR);
+      throw new HttpException(
+        'Falha ao gerar link de pagamento.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }

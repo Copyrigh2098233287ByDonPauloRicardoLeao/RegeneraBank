@@ -61,7 +61,10 @@ export class SecurityController {
    * No fake alert only - motor real.
    */
   @Post('sos')
-  async triggerSOS(@Req() req: any, @Body() body: { reason?: string; location?: string }) {
+  async triggerSOS(
+    @Req() req: any,
+    @Body() body: { reason?: string; location?: string },
+  ) {
     return this.securityService.triggerSOS(req.user.sub, body);
   }
 }

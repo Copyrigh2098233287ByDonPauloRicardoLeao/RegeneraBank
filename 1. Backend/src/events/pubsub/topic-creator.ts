@@ -31,7 +31,7 @@ export class TopicCreator implements OnModuleInit {
     'pix.settled',
     'pix.failed',
     'ledger.update',
-    'compliance.check'
+    'compliance.check',
   ];
 
   constructor(private pubsubClient: PubSubClient) {}

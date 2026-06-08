@@ -42,9 +42,11 @@ export class LedgerStreamService {
 
   constructor(
     private readonly bqProvider: BigQueryProvider,
-    private readonly bufferManager: StreamBufferManager<LedgerEntry>
+    private readonly bufferManager: StreamBufferManager<LedgerEntry>,
   ) {
-    this.bufferManager.onFlush(async (entries) => this.flushToBigQuery(entries));
+    this.bufferManager.onFlush(async (entries) =>
+      this.flushToBigQuery(entries),
+    );
   }
 
   async streamEntry(entry: LedgerEntry) {
@@ -59,7 +61,9 @@ export class LedgerStreamService {
         skipInvalidRows: false,
         ignoreUnknownValues: false,
       });
-      this.logger.log(`Successfully streamed ${entries.length} entries to BigQuery`);
+      this.logger.log(
+        `Successfully streamed ${entries.length} entries to BigQuery`,
+      );
     } catch (error) {
       this.logger.error('BigQuery Streaming Insert Failed', error.stack);
       // Aqui entraria lógica de Dead Letter Queue (DLQ)

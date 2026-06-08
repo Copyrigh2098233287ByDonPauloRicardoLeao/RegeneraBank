@@ -43,7 +43,10 @@ export class AccountEntity {
   neuralId: string; // e.g. 'RG-2098233287' or 'DOW-PAULO-AGI-01'
 
   // Optional FK to users table (from official schema). Code can create User on first use.
-  @ManyToOne(() => UserEntity, (user) => user.accounts, { nullable: true, eager: false })
+  @ManyToOne(() => UserEntity, (user) => user.accounts, {
+    nullable: true,
+    eager: false,
+  })
   @JoinColumn({ name: 'user_id' })
   user?: UserEntity;
 

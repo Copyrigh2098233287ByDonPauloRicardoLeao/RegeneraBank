@@ -20,11 +20,11 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { MigrationInterface, QueryRunner } from "typeorm";
+import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class CreateIdempotency002 implements MigrationInterface {
-    public async up(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`
+  public async up(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`
             CREATE TABLE idempotency_keys (
                 idempotency_key VARCHAR(255) PRIMARY KEY,
                 request_path TEXT NOT NULL,
@@ -35,9 +35,9 @@ export class CreateIdempotency002 implements MigrationInterface {
             );
             CREATE INDEX idx_idempotency_expiry ON idempotency_keys(expires_at);
         `);
-    }
+  }
 
-    public async down(queryRunner: QueryRunner): Promise<void> {
-        await queryRunner.query(`DROP TABLE idempotency_keys;`);
-    }
+  public async down(queryRunner: QueryRunner): Promise<void> {
+    await queryRunner.query(`DROP TABLE idempotency_keys;`);
+  }
 }

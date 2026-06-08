@@ -59,7 +59,10 @@ import { HealthController } from './health.controller';
       useFactory: (config: ConfigService): any => {
         return {
           type: process.env.NODE_ENV === 'test' ? 'sqlite' : 'postgres',
-          url: process.env.NODE_ENV === 'test' ? undefined : config.getOrThrow<string>('DATABASE_URL'),
+          url:
+            process.env.NODE_ENV === 'test'
+              ? undefined
+              : config.getOrThrow<string>('DATABASE_URL'),
           database: process.env.NODE_ENV === 'test' ? ':memory:' : undefined,
           ssl: {
             rejectUnauthorized: process.env.NODE_ENV === 'production',

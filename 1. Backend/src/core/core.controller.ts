@@ -40,7 +40,16 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
 // |---------------------------------------------------------------------------------------|
 
-import { Controller, Get, Post, Body, Req, UseGuards, Logger, Param } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  UseGuards,
+  Logger,
+  Param,
+} from '@nestjs/common';
 import { CoreService } from './core.service';
 import { NeuralAuthGuard } from '../auth/auth.guard';
 
@@ -77,6 +86,10 @@ export class CoreController {
     @Req() req: any,
     @Body() body: { receiverId: string; amount: number },
   ) {
-    return this.coreService.transfer(req.user.sub, body.receiverId, Math.round(body.amount * 100));
+    return this.coreService.transfer(
+      req.user.sub,
+      body.receiverId,
+      Math.round(body.amount * 100),
+    );
   }
 }

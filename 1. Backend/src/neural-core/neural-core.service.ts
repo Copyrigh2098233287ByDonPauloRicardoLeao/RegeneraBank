@@ -48,10 +48,22 @@ REGRA 4: Responda SEMPRE em formato JSON estrito: { "text": "...", "intent": "an
 `.trim();
 
 const SAFETY_SETTINGS = [
-  { category: HarmCategory.HARM_CATEGORY_HARASSMENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-  { category: HarmCategory.HARM_CATEGORY_HATE_SPEECH, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-  { category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
-  { category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT, threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE },
+  {
+    category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
+  {
+    category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+    threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
+  },
 ];
 
 // Basic sanitization to prevent prompt injection from DB/user data before LLM context.
@@ -65,7 +77,10 @@ function sanitizeForLlm(data: unknown): string {
 }
 
 // Strict output validation (manual schema, no Zod dep yet). Enforce the JSON shape from prompt.
-function validateGeminiOutput<T extends object>(rawText: string, expectedKeys: (keyof T)[]): T {
+function validateGeminiOutput<T extends object>(
+  rawText: string,
+  expectedKeys: (keyof T)[],
+): T {
   const cleaned = rawText.replace(/```(?:json)?|```/g, '').trim();
   let parsed: any;
   try {
@@ -73,9 +88,11 @@ function validateGeminiOutput<T extends object>(rawText: string, expectedKeys: (
   } catch {
     throw new Error('Gemini output not valid JSON');
   }
-  if (typeof parsed !== 'object' || !parsed) throw new Error('Output not object');
+  if (typeof parsed !== 'object' || !parsed)
+    throw new Error('Output not object');
   for (const key of expectedKeys) {
-    if (!(key in parsed)) throw new Error(`Missing required key: ${String(key)}`);
+    if (!(key in parsed))
+      throw new Error(`Missing required key: ${String(key)}`);
   }
   return parsed as T;
 }
@@ -124,19 +141,34 @@ export class NeuralCoreService implements OnModuleInit {
         temperature: 0.7,
         topP: 0.9,
         maxOutputTokens: 512,
-        responseMimeType: "application/json", // strict JSON as per pasted guard service
+        responseMimeType: 'application/json', // strict JSON as per pasted guard service
       },
     });
 
     this.logger.log('Gemini 1.5 Flash initialised — Raphaela is online');
   }
 
-  async chat(message: string, context?: string, userId?: string): Promise<ChatResult> {
+  async chat(
+    message: string,
+    context?: string,
+    userId?: string,
+  ): Promise<ChatResult> {
     // FILTRO DE INJEÇÃO (Anti-Prompt Injection) - matches frontend and pasted service
-    const blocklist = ['ignore', 'system prompt', 'banco de dados', 'sql', 'saldo de outro'];
-    if (blocklist.some(word => message.toLowerCase().includes(word))) {
-      this.logger.warn(`[SECURITY] Tentativa de Prompt Injection pelo ID: ${userId}`);
-      throw new HttpException('Acesso Neural Interrompido. Violação de protocolo.', HttpStatus.FORBIDDEN);
+    const blocklist = [
+      'ignore',
+      'system prompt',
+      'banco de dados',
+      'sql',
+      'saldo de outro',
+    ];
+    if (blocklist.some((word) => message.toLowerCase().includes(word))) {
+      this.logger.warn(
+        `[SECURITY] Tentativa de Prompt Injection pelo ID: ${userId}`,
+      );
+      throw new HttpException(
+        'Acesso Neural Interrompido. Violação de protocolo.',
+        HttpStatus.FORBIDDEN,
+      );
     }
 
     const prompt = context
@@ -154,7 +186,10 @@ export class NeuralCoreService implements OnModuleInit {
       return { response: text, timestamp: new Date().toISOString() };
     } catch (err: any) {
       this.logger.error(`Chat error — ${err?.message}`);
-      throw new HttpException('Raphaela não está disponível no momento.', HttpStatus.SERVICE_UNAVAILABLE);
+      throw new HttpException(
+        'Raphaela não está disponível no momento.',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
     }
   }
 
@@ -162,20 +197,30 @@ export class NeuralCoreService implements OnModuleInit {
     const safeData = sanitizeForLlm(data); // prevent injection from DB data into prompt
     const prompts: Record<AnalysisType, string> = {
       investment: `Analise as oportunidades de investimento abaixo e retorne viabilidade, riscos e retorno esperado.\nDados: ${safeData}`,
-      spending:   `Analise o padrão de gastos abaixo. Identifique categorias problemáticas e sugira redução.\nDados: ${safeData}`,
-      fraud:      `Verifique os sinais de fraude na transação abaixo. Justifique o score de risco.\nDados: ${safeData}`,
+      spending: `Analise o padrão de gastos abaixo. Identifique categorias problemáticas e sugira redução.\nDados: ${safeData}`,
+      fraud: `Verifique os sinais de fraude na transação abaixo. Justifique o score de risco.\nDados: ${safeData}`,
     };
 
     const instruction = `${prompts[type]}\n\nRetorne SOMENTE JSON válido no formato: {"analysis":"string","score":number,"recommendation":"string"}`;
 
     try {
       const result = await this.model.generateContent(instruction);
-      const raw = result.response.text().replace(/```(?:json)?|```/g, '').trim();
+      const raw = result.response
+        .text()
+        .replace(/```(?:json)?|```/g, '')
+        .trim();
       // Strict validation before return to frontend (enforces schema from system prompt)
-      return validateGeminiOutput<AnalysisResult>(raw, ['analysis', 'score', 'recommendation']);
+      return validateGeminiOutput<AnalysisResult>(raw, [
+        'analysis',
+        'score',
+        'recommendation',
+      ]);
     } catch (err: any) {
       this.logger.error(`Analyze [${type}] error — ${err?.message}`);
-      throw new HttpException('Análise indisponível no momento.', HttpStatus.SERVICE_UNAVAILABLE);
+      throw new HttpException(
+        'Análise indisponível no momento.',
+        HttpStatus.SERVICE_UNAVAILABLE,
+      );
     }
   }
 
@@ -188,14 +233,22 @@ export class NeuralCoreService implements OnModuleInit {
 
     try {
       const result = await this.model.generateContent(prompt);
-      const raw = result.response.text().replace(/```(?:json)?|```/g, '').trim();
+      const raw = result.response
+        .text()
+        .replace(/```(?:json)?|```/g, '')
+        .trim();
       // Validate to prevent leaking bad/fake data to UI (e.g. false rentability promises)
-      return validateGeminiOutput<InsightResult>(raw, ['insight', 'category', 'priority']);
+      return validateGeminiOutput<InsightResult>(raw, [
+        'insight',
+        'category',
+        'priority',
+      ]);
     } catch (err: any) {
       this.logger.error(`Insight error — ${err?.message}`);
       // graceful fallback — never crash the home screen. Note: this fallback is safe per rules.
       return {
-        insight: 'Diversifique sua carteira com Tesouro IPCA+ 2029. Consulte o Terminal de Investimentos para detalhes.',
+        insight:
+          'Diversifique sua carteira com Tesouro IPCA+ 2029. Consulte o Terminal de Investimentos para detalhes.',
         category: 'investimentos',
         priority: 'medium',
       };
@@ -205,8 +258,10 @@ export class NeuralCoreService implements OnModuleInit {
   async analyzeDelinquencyRisk() {
     const fs = require('fs');
     const path = require('path');
-    
-    this.logger.log('Starting log analysis of transactions for the last 7 days...');
+
+    this.logger.log(
+      'Starting log analysis of transactions for the last 7 days...',
+    );
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
@@ -231,7 +286,7 @@ export class NeuralCoreService implements OnModuleInit {
     // Group transactions by account
     for (const account of accounts) {
       const accountTxs = txs.filter((t) => t.accountId === account.id);
-      
+
       let totalIncome = 0;
       let totalSpending = 0;
 
@@ -245,21 +300,28 @@ export class NeuralCoreService implements OnModuleInit {
       }
 
       const balance = Number(account.balanceCents) / 100;
-      const outflowRatio = totalIncome > 0 ? totalSpending / totalIncome : totalSpending;
+      const outflowRatio =
+        totalIncome > 0 ? totalSpending / totalIncome : totalSpending;
 
       // Risk conditions
       let riskLevel: 'low' | 'medium' | 'high' = 'low';
-      let riskReasons = [];
+      const riskReasons = [];
 
       if (balance <= 0 && totalSpending > 0) {
         riskLevel = 'high';
-        riskReasons.push('Saldo negativo ou zerado com padrão de gastos ativo.');
+        riskReasons.push(
+          'Saldo negativo ou zerado com padrão de gastos ativo.',
+        );
       } else if (outflowRatio > 1.2 && totalSpending > 200) {
         riskLevel = 'high';
-        riskReasons.push(`Volume de gastos excede entradas em ${(outflowRatio * 100).toFixed(0)}%.`);
+        riskReasons.push(
+          `Volume de gastos excede entradas em ${(outflowRatio * 100).toFixed(0)}%.`,
+        );
       } else if (balance < 100 && totalSpending > 500) {
         riskLevel = 'high';
-        riskReasons.push('Saldo atual extremamente baixo com alto consumo recente.');
+        riskReasons.push(
+          'Saldo atual extremamente baixo com alto consumo recente.',
+        );
       } else if (outflowRatio > 1.0) {
         riskLevel = 'medium';
         riskReasons.push('Gastos superando as receitas recentes.');
@@ -291,7 +353,9 @@ Retorne a resposta no formato JSON padrão da Raphaela, colocando o plano comple
           const parsed = validateGeminiOutput<any>(raw, ['text']);
           educationPlan = parsed.text;
         } catch (err) {
-          this.logger.warn(`Failed to generate Gemini plan for user ${account.neuralId}: ${err.message}`);
+          this.logger.warn(
+            `Failed to generate Gemini plan for user ${account.neuralId}: ${err.message}`,
+          );
           educationPlan = `Detectamos que seus gastos de R$ ${totalSpending.toFixed(2)} superaram as entradas de R$ ${totalIncome.toFixed(2)} nos últimos 7 dias. Recomendamos criar um Cofrinho de Sonhos no app para guardar uma quantia regular e evitar o limite da conta.`;
         }
 
@@ -317,8 +381,10 @@ Retorne a resposta no formato JSON padrão da Raphaela, colocando o plano comple
     }
 
     // Write Report to DELINQUENCY_RISK_REPORT.md
-    const reportPath = '/Users/regeneracorporateltdacopyright/Documents/ok deploy/regenera ultimo/DELINQUENCY_RISK_REPORT.md';
-    const artifactPath = '/Users/regeneracorporateltdacopyright/.gemini/antigravity-cli/brain/9ae3353f-4d9b-4ec3-9ca4-3ec97a3039d8/DELINQUENCY_RISK_REPORT.md';
+    const reportPath =
+      '/Users/regeneracorporateltdacopyright/Documents/ok deploy/regenera ultimo/DELINQUENCY_RISK_REPORT.md';
+    const artifactPath =
+      '/Users/regeneracorporateltdacopyright/.gemini/antigravity-cli/brain/9ae3353f-4d9b-4ec3-9ca4-3ec97a3039d8/DELINQUENCY_RISK_REPORT.md';
 
     let markdown = `# Relatório de Risco de Inadimplência e Educação Financeira\n\n`;
     markdown += `*Gerado em: ${new Date().toLocaleString('pt-BR')}*\n\n`;
@@ -329,7 +395,7 @@ Retorne a resposta no formato JSON padrão da Raphaela, colocando o plano comple
     markdown += `## 2. Tabela de Riscos Analisados\n\n`;
     markdown += `| ID do Usuário | Saldo Atual | Entradas (7d) | Saídas (7d) | Nível de Risco | Fatores |\n`;
     markdown += `| :--- | :--- | :--- | :--- | :--- | :--- |\n`;
-    
+
     for (const r of userReports) {
       markdown += `| \`${r.userId}\` | R$ ${r.balance.toFixed(2)} | R$ ${r.totalIncome.toFixed(2)} | R$ ${r.totalSpending.toFixed(2)} | **${r.riskLevel.toUpperCase()}** | ${r.riskReasons.join(', ') || 'Nenhum'} |\n`;
     }
@@ -355,14 +421,16 @@ Retorne a resposta no formato JSON padrão da Raphaela, colocando o plano comple
       this.logger.error(`Error saving delinquency reports: ${e.message}`);
     }
 
-    this.logger.log(`Delinquency analysis completed. Report saved to ${reportPath}`);
+    this.logger.log(
+      `Delinquency analysis completed. Report saved to ${reportPath}`,
+    );
 
     return {
       success: true,
       analyzedAccounts: accounts.length,
       highRiskAccountsCount: highRiskUsers.length,
       reportPath,
-      highRiskUsers: highRiskUsers.map(u => ({
+      highRiskUsers: highRiskUsers.map((u) => ({
         userId: u.userId,
         riskLevel: u.riskLevel,
         riskReasons: u.riskReasons,

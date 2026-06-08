@@ -20,16 +20,16 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { 
-  Controller, 
-  Post, 
-  Get, 
+import {
+  Controller,
+  Post,
+  Get,
   Patch,
-  Body, 
-  HttpCode, 
-  HttpStatus, 
-  Req, 
-  UseGuards 
+  Body,
+  HttpCode,
+  HttpStatus,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { IsString, IsEmail, MinLength, IsOptional } from 'class-validator';
 import { AuthService } from './auth.service';

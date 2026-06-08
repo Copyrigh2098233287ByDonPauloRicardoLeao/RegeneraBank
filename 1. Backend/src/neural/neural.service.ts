@@ -63,15 +63,17 @@ export class NeuralService {
    * Synchronizes with the core ledger to provide proactive financial intelligence.
    */
   async generateFinancialInsights(neuralId: string) {
-    this.logger.log(`Neural Core: Synchronizing financial patterns for ${neuralId}`);
+    this.logger.log(
+      `Neural Core: Synchronizing financial patterns for ${neuralId}`,
+    );
 
     const userSnapshot = {
-      monthlyVolume: 12450.90,
+      monthlyVolume: 12450.9,
       categories: [
         { name: 'Lifestyle & Tech', amount: 5400 },
         { name: 'Assinaturas/SaaS', amount: 850 },
-        { name: 'Transporte Executivo', amount: 1200 }
-      ]
+        { name: 'Transporte Executivo', amount: 1200 },
+      ],
     };
 
     try {
@@ -79,26 +81,39 @@ export class NeuralService {
         model: 'neural-processor-v4',
         systemInstruction: {
           role: 'system',
-          parts: [{
-            text: `Você é o Neural Core, o processador central do Regenera Bank. 
+          parts: [
+            {
+              text: `Você é o Neural Core, o processador central do Regenera Bank. 
             Analise os dados financeiros do usuário com tom direto, sofisticado e cyberpunk.
-            Devolva APENAS um array JSON válido contendo 3 objetos com "type" ('alerta', 'info', 'sucesso') e "message".`
-          }]
-        }
+            Devolva APENAS um array JSON válido contendo 3 objetos com "type" ('alerta', 'info', 'sucesso') e "message".`,
+            },
+          ],
+        },
       });
 
       const prompt = `Snapshot Neural: ${JSON.stringify(userSnapshot)}`;
       const result = await processor.generateContent(prompt);
-      const responseText = result.response.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
+      const responseText =
+        result.response.candidates?.[0]?.content?.parts?.[0]?.text || '[]';
 
       const cleanJson = responseText.replace(/```json|```/g, '').trim();
       return JSON.parse(cleanJson);
     } catch (error) {
-      this.logger.error("Neural Synchronization Failure", error);
+      this.logger.error('Neural Synchronization Failure', error);
       return [
-        { type: 'info', message: 'Sua reserva de emergência rendeu 1.2% acima do CDI este mês.' },
-        { type: 'alerta', message: 'Detectei aumento de 15% em gastos com Tech este mês.' },
-        { type: 'sucesso', message: 'Você atingiu o nível Enterprise de RevPoints!' }
+        {
+          type: 'info',
+          message:
+            'Sua reserva de emergência rendeu 1.2% acima do CDI este mês.',
+        },
+        {
+          type: 'alerta',
+          message: 'Detectei aumento de 15% em gastos com Tech este mês.',
+        },
+        {
+          type: 'sucesso',
+          message: 'Você atingiu o nível Enterprise de RevPoints!',
+        },
       ];
     }
   }
@@ -111,29 +126,35 @@ export class NeuralService {
     this.logger.log(`Neural Core: Processing instruction for ${neuralId}`);
 
     try {
-      const processor = this.neuralCore.preview.getGenerativeModel({ model: 'neural-sync-v4' });
+      const processor = this.neuralCore.preview.getGenerativeModel({
+        model: 'neural-sync-v4',
+      });
       const chatResult = await processor.generateContent(userText);
-      const replyText = chatResult.response.candidates?.[0]?.content?.parts?.[0]?.text || 'Sincronizando...';
+      const replyText =
+        chatResult.response.candidates?.[0]?.content?.parts?.[0]?.text ||
+        'Sincronizando...';
 
       const [ttsResponse] = await this.ttsClient.synthesizeSpeech({
         input: { text: replyText },
         voice: { languageCode: 'pt-BR', name: 'pt-BR-Neural2-C' },
-        audioConfig: { 
-          audioEncoding: 'MP3' as const, 
-          speakingRate: 1.1, 
-          pitch: -0.5 
+        audioConfig: {
+          audioEncoding: 'MP3' as const,
+          speakingRate: 1.1,
+          pitch: -0.5,
         },
       });
 
       return {
         text: replyText,
-        audioBase64: ttsResponse.audioContent ? Buffer.from(ttsResponse.audioContent as any).toString('base64') : null
+        audioBase64: ttsResponse.audioContent
+          ? Buffer.from(ttsResponse.audioContent as any).toString('base64')
+          : null,
       };
     } catch (error) {
-      this.logger.error("Neural Voice Core Failure", error);
-      return { 
-        text: "Desculpe, Paulo. Minha rede neural está em manutenção momentânea.", 
-        audioBase64: null 
+      this.logger.error('Neural Voice Core Failure', error);
+      return {
+        text: 'Desculpe, Paulo. Minha rede neural está em manutenção momentânea.',
+        audioBase64: null,
       };
     }
   }

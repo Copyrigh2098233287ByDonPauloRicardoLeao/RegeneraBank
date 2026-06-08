@@ -20,7 +20,15 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { Controller, Get, Post, Body, UseGuards, Req, ForbiddenException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  UseGuards,
+  Req,
+  ForbiddenException,
+} from '@nestjs/common';
 import { InfraService } from './infra.service';
 import { NeuralAuthGuard } from '../auth/auth.guard';
 
@@ -37,7 +45,10 @@ export class InfraController {
   }
 
   @Post('toggle')
-  async toggle(@Body() body: { instanceId: string; action: 'start' | 'stop' }, @Req() req: any) {
+  async toggle(
+    @Body() body: { instanceId: string; action: 'start' | 'stop' },
+    @Req() req: any,
+  ) {
     this.checkAdminClaim(req); // Enforce Custom Claim 'role: SysAdmin' or equivalent from Firebase IdToken / Neural payload before any infra mutation.
     // Biometric step-up enforced in frontend GCPDashboard before calling this.
     // Backend also relies on IAM roles for the Cloud Run service account.
@@ -47,9 +58,12 @@ export class InfraController {
   private checkAdminClaim(req: any) {
     const user = req.user;
     // Support both Neural JWT payload (with role) and if Firebase claims passed through.
-    const role = user?.role || user?.['role'] || (user?.claims && user.claims.role);
+    const role =
+      user?.role || user?.['role'] || (user?.claims && user.claims.role);
     if (role !== 'admin' && role !== 'SysAdmin') {
-      throw new ForbiddenException('Acesso negado. Requer cargo corporativo SysAdmin (Custom Claim no IdToken).');
+      throw new ForbiddenException(
+        'Acesso negado. Requer cargo corporativo SysAdmin (Custom Claim no IdToken).',
+      );
     }
   }
 }

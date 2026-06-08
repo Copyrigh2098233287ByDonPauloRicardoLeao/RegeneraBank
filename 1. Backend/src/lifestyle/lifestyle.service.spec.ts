@@ -12,9 +12,9 @@ jest.mock('firebase-admin', () => {
     const txMock = {
       get: jest.fn().mockResolvedValue({
         exists: true,
-        data: () => ({ currentCents: 1000, targetCents: 50000 })
+        data: () => ({ currentCents: 1000, targetCents: 50000 }),
       }),
-      update: jest.fn()
+      update: jest.fn(),
     };
     return callback(txMock);
   });
@@ -25,8 +25,8 @@ jest.mock('firebase-admin', () => {
     firestore: jest.fn().mockReturnValue({
       collection: jest.fn().mockReturnThis(),
       doc: jest.fn().mockReturnThis(),
-      runTransaction: runTransactionMock
-    })
+      runTransaction: runTransactionMock,
+    }),
   };
 });
 
@@ -72,19 +72,30 @@ describe('LifestyleService (Dreams & Marketplace)', () => {
 
   describe('addFundsToDream', () => {
     it('deve debitar o saldo ACID e repassar o aporte para o Cofre de Sonho no Firestore', async () => {
-      const result = await service.addFundsToDream('usr_1', 'dream_1', 5000, 'idemp-123'); // 50 reais
-      
+      const result = await service.addFundsToDream(
+        'usr_1',
+        'dream_1',
+        5000,
+        'idemp-123',
+      ); // 50 reais
+
       expect(result.status).toBe('SETTLED');
-      expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 5000, expect.any(Object));
+      expect(coreServiceMock.debit).toHaveBeenCalledWith(
+        'usr_1',
+        5000,
+        expect.any(Object),
+      );
       // Verifica se a idempotência foi destravada e salva
       expect(idempotencyMock.acquireLock).toHaveBeenCalled();
     });
 
     it('deve bloquear aporte se o usuário não possuir saldo em conta (InsufficientFundsException)', async () => {
-      coreServiceMock.debit.mockRejectedValueOnce(new InsufficientFundsException());
-      
+      coreServiceMock.debit.mockRejectedValueOnce(
+        new InsufficientFundsException(),
+      );
+
       await expect(
-        service.addFundsToDream('usr_1', 'dream_1', 5000000)
+        service.addFundsToDream('usr_1', 'dream_1', 5000000),
       ).rejects.toThrow(InsufficientFundsException);
     });
   });
@@ -92,10 +103,17 @@ describe('LifestyleService (Dreams & Marketplace)', () => {
   describe('processMarketplacePurchase', () => {
     it('deve debitar no banco ACID e disparar evento Pub/Sub de Cashback', async () => {
       // Como o PubSub interno da classe é não-injetável de forma simples, focamos no débito
-      const result = await service.processMarketplacePurchase('usr_1', 'prod_123');
-      
+      const result = await service.processMarketplacePurchase(
+        'usr_1',
+        'prod_123',
+      );
+
       expect(result.status).toBe('APPROVED');
-      expect(coreServiceMock.debit).toHaveBeenCalledWith('usr_1', 1500, expect.objectContaining({ type: 'MARKETPLACE_BUY' }));
+      expect(coreServiceMock.debit).toHaveBeenCalledWith(
+        'usr_1',
+        1500,
+        expect.objectContaining({ type: 'MARKETPLACE_BUY' }),
+      );
     });
   });
 });

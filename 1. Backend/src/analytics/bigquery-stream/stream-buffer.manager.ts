@@ -50,7 +50,7 @@ export class StreamBufferManager<T> {
 
     const dataToFlush = [...this.buffer];
     this.buffer = [];
-    
+
     await this.flushCallback(dataToFlush);
   }
 }

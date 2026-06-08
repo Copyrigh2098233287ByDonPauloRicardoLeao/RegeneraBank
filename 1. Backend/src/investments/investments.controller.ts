@@ -40,7 +40,15 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
 // |---------------------------------------------------------------------------------------|
 
-import { Controller, Get, Post, Body, Req, UseGuards, Headers } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  UseGuards,
+  Headers,
+} from '@nestjs/common';
 import { IsString, IsNumber, IsIn, Min, IsOptional } from 'class-validator';
 import { InvestmentsService } from './investments.service';
 import { NeuralAuthGuard } from '../auth/auth.guard';
@@ -70,6 +78,12 @@ export class InvestmentsController {
     @Headers('idempotency-key') headerIdemKey?: string,
   ) {
     const idemKey = headerIdemKey || dto.idempotencyKey;
-    return this.investmentsService.executeTrade(req.user.sub, dto.symbol, dto.quantity, dto.type, idemKey);
+    return this.investmentsService.executeTrade(
+      req.user.sub,
+      dto.symbol,
+      dto.quantity,
+      dto.type,
+      idemKey,
+    );
   }
 }

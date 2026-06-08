@@ -82,7 +82,9 @@ export class NeuralCoreController {
   analyze(@Body() body: AnalyzeDto) {
     const allowed: AnalysisType[] = ['investment', 'spending', 'fraud'];
     if (!allowed.includes(body?.type)) {
-      throw new BadRequestException(`type must be one of: ${allowed.join(', ')}`);
+      throw new BadRequestException(
+        `type must be one of: ${allowed.join(', ')}`,
+      );
     }
     return this.svc.analyze(body.type, body.data);
   }

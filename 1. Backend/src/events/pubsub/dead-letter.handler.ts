@@ -29,23 +29,29 @@ export class DeadLetterHandler {
 
   constructor(private pubsubClient: PubSubClient) {}
 
-  async handleCorruptedMessage(topicName: string, error: Error, originalPayload: any) {
+  async handleCorruptedMessage(
+    topicName: string,
+    error: Error,
+    originalPayload: any,
+  ) {
     const dlqTopic = `${topicName}.dlq`;
     const client = this.pubsubClient.getClient();
 
-    this.logger.error(`Critical Failure on topic ${topicName}: ${error.message}`);
-    
+    this.logger.error(
+      `Critical Failure on topic ${topicName}: ${error.message}`,
+    );
+
     await client.topic(dlqTopic).publishMessage({
       json: {
         originalTopic: topicName,
         error: error.message,
         timestamp: new Date().toISOString(),
-        payload: originalPayload
+        payload: originalPayload,
       },
       attributes: {
         severity: 'CRITICAL',
-        retry: 'false'
-      }
+        retry: 'false',
+      },
     });
 
     this.logger.warn(`Message routed to DLQ: ${dlqTopic}`);

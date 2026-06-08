@@ -29,20 +29,22 @@ import { ValidationPipe } from '@nestjs/common';
 
 jest.mock('@google-cloud/secret-manager', () => ({
   SecretManagerServiceClient: jest.fn().mockImplementation(() => ({
-    accessSecretVersion: jest.fn().mockResolvedValue([{
-      payload: { data: Buffer.from('MOCK_SECRET_VALUE') }
-    }])
-  }))
+    accessSecretVersion: jest.fn().mockResolvedValue([
+      {
+        payload: { data: Buffer.from('MOCK_SECRET_VALUE') },
+      },
+    ]),
+  })),
 }));
 
 jest.mock('@google-cloud/vertexai', () => ({
   VertexAI: jest.fn().mockImplementation(() => ({
     getGenerativeModel: jest.fn().mockReturnValue({
       generateContent: jest.fn().mockResolvedValue({
-        response: { text: () => 'MOCK_VERTEX_RESPONSE' }
-      })
-    })
-  }))
+        response: { text: () => 'MOCK_VERTEX_RESPONSE' },
+      }),
+    }),
+  })),
 }));
 
 jest.mock('@google-cloud/pubsub', () => ({
@@ -50,13 +52,13 @@ jest.mock('@google-cloud/pubsub', () => ({
     topic: jest.fn().mockReturnValue({
       publishMessage: jest.fn().mockResolvedValue('msg-1'),
       subscription: jest.fn().mockReturnValue({
-        on: jest.fn()
-      })
+        on: jest.fn(),
+      }),
     }),
     subscription: jest.fn().mockReturnValue({
-      on: jest.fn()
-    })
-  }))
+      on: jest.fn(),
+    }),
+  })),
 }));
 
 describe('Security Audit (e2e) - OWASP Top 10 Mitigation', () => {
@@ -68,7 +70,7 @@ describe('Security Audit (e2e) - OWASP Top 10 Mitigation', () => {
     }).compile();
 
     app = moduleFixture.createNestApplication();
-    
+
     app.use(helmet());
     app.useGlobalPipes(
       new ValidationPipe({
@@ -78,7 +80,7 @@ describe('Security Audit (e2e) - OWASP Top 10 Mitigation', () => {
         transformOptions: { enableImplicitConversion: true },
       }),
     );
-    
+
     await app.init();
   });
 
@@ -92,7 +94,7 @@ describe('Security Audit (e2e) - OWASP Top 10 Mitigation', () => {
     // Usando endpoint existente e vulnerável simulado. Deve rejeitar no DTO/Guard.
     return request(app.getHttpServer())
       .post('/auth/neural-sync')
-      .set('neuralId', "1 OR 1=1; DROP TABLE users;--")
+      .set('neuralId', '1 OR 1=1; DROP TABLE users;--')
       .expect(HttpStatus.BAD_REQUEST); // O guard de segurança e sanitização deve bloquear payloads maliciosos
   });
 
@@ -113,9 +115,9 @@ describe('Security Audit (e2e) - OWASP Top 10 Mitigation', () => {
       .post('/open-finance/connect')
       .set('Authorization', 'Bearer MOCK_TOKEN')
       .send({
-        provider: "<script>alert(1)</script>",
-        username: "user",
-        password: "pwd"
+        provider: '<script>alert(1)</script>',
+        username: 'user',
+        password: 'pwd',
       })
       .expect(HttpStatus.BAD_REQUEST); // Validação de Input DTO deve rejeitar tags HTML
   });

@@ -30,7 +30,8 @@ import { GoogleAuth } from 'google-auth-library';
 export class InfraService {
   private readonly logger = new Logger(InfraService.name);
   private readonly auth = new GoogleAuth();
-  private readonly project = process.env.GOOGLE_CLOUD_PROJECT || 'project-93b8df04-72ab-4e44-8a6';
+  private readonly project =
+    process.env.GOOGLE_CLOUD_PROJECT || 'project-93b8df04-72ab-4e44-8a6';
 
   async listInstances() {
     // Real call to Cloud Run Admin API to list services (treated as "instances" for dashboard).
@@ -48,7 +49,9 @@ export class InfraService {
         machineType: 'cloud-run',
       }));
     } catch (e) {
-      this.logger.warn('Real GCP call failed, using minimal (check IAM permissions for Cloud Run Admin)');
+      this.logger.warn(
+        'Real GCP call failed, using minimal (check IAM permissions for Cloud Run Admin)',
+      );
       // In prod, this should not fallback if IAM correct.
       return [];
     }
@@ -73,11 +76,15 @@ export class InfraService {
       };
       const url = `https://run.googleapis.com/v2/${serviceName}?updateMask=${updateMask}`;
       await client.request({ url, method: 'PATCH', body });
-      this.logger.log(`Real toggle ${action} for ${id} via Cloud Run Admin API`);
+      this.logger.log(
+        `Real toggle ${action} for ${id} via Cloud Run Admin API`,
+      );
       return { status: 'success', id, action };
     } catch (e: any) {
       this.logger.error(`GCP toggle failed for ${id}: ${e.message}`);
-      throw new Error(`Infra action failed: ${e.message} (check IAM + Secret Manager for creds if needed)`);
+      throw new Error(
+        `Infra action failed: ${e.message} (check IAM + Secret Manager for creds if needed)`,
+      );
     }
   }
 }

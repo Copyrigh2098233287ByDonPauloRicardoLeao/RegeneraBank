@@ -29,7 +29,9 @@ export class BigQueryProvider implements OnModuleInit {
   private bq: BigQuery;
 
   async onModuleInit() {
-    this.logger.log('Initializing BigQuery Connection with gRPC optimization...');
+    this.logger.log(
+      'Initializing BigQuery Connection with gRPC optimization...',
+    );
     this.bq = new BigQuery({
       projectId: process.env.GCP_PROJECT_ID,
       keyFilename: process.env.GCP_KEYFILE_PATH,

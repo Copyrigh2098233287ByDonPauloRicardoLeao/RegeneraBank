@@ -146,7 +146,14 @@
 <a name='L81'></a><a href='#L81'>81</a>
 <a name='L82'></a><a href='#L82'>82</a>
 <a name='L83'></a><a href='#L83'>83</a>
-<a name='L84'></a><a href='#L84'>84</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -183,28 +190,8 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -217,15 +204,42 @@
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -261,7 +275,8 @@ import { GoogleAuth } from 'google-auth-library';
 export class InfraService {
   private readonly logger = new Logger(InfraService.name);
   private readonly auth = new GoogleAuth();
-  private readonly project = process.env.GOOGLE_CLOUD_PROJECT || <span class="branch-1 cbranch-no" title="branch not covered" >'project-93b8df04-72ab-4e44-8a6';</span>
+  private readonly project =
+    process.env.GOOGLE_CLOUD_PROJECT || <span class="branch-1 cbranch-no" title="branch not covered" >'project-93b8df04-72ab-4e44-8a6';</span>
 &nbsp;
 <span class="fstat-no" title="function not covered" >  async </span>listInstances() {
     // Real call to Cloud Run Admin API to list services (treated as "instances" for dashboard).
@@ -279,7 +294,9 @@ export class InfraService {
         machineType: 'cloud-run',
       }));
     } catch (e) {
-<span class="cstat-no" title="statement not covered" >      this.logger.warn('Real GCP call failed, using minimal (check IAM permissions for Cloud Run Admin)');</span>
+<span class="cstat-no" title="statement not covered" >      this.logger.warn(</span>
+        'Real GCP call failed, using minimal (check IAM permissions for Cloud Run Admin)',
+      );
       // In prod, this should not fallback if IAM correct.
 <span class="cstat-no" title="statement not covered" >      return [];</span>
     }
@@ -304,11 +321,15 @@ export class InfraService {
       };
       const url = <span class="cstat-no" title="statement not covered" >`https://run.googleapis.com/v2/${serviceName}?updateMask=${updateMask}`;</span>
 <span class="cstat-no" title="statement not covered" >      await client.request({ url, method: 'PATCH', body });</span>
-<span class="cstat-no" title="statement not covered" >      this.logger.log(`Real toggle ${action} for ${id} via Cloud Run Admin API`);</span>
+<span class="cstat-no" title="statement not covered" >      this.logger.log(</span>
+        `Real toggle ${action} for ${id} via Cloud Run Admin API`,
+      );
 <span class="cstat-no" title="statement not covered" >      return { status: 'success', id, action };</span>
     } catch (e: any) {
 <span class="cstat-no" title="statement not covered" >      this.logger.error(`GCP toggle failed for ${id}: ${e.message}`);</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error(`Infra action failed: ${e.message} (check IAM + Secret Manager for creds if needed)`);</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error(</span>
+        `Infra action failed: ${e.message} (check IAM + Secret Manager for creds if needed)`,
+      );
     }
   }
 }
@@ -319,7 +340,7 @@ export class InfraService {
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-08T20:37:33.419Z
+                at 2026-06-08T20:47:23.773Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

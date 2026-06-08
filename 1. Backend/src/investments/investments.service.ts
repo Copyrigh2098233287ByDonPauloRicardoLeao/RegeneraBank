@@ -20,11 +20,22 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { Injectable, Logger, Inject, forwardRef, BadRequestException, InternalServerErrorException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  Inject,
+  forwardRef,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { randomUUID } from 'crypto';
-import { CoreService, FinancialSecurityException, InsufficientFundsException } from '../core/core.service';
+import {
+  CoreService,
+  FinancialSecurityException,
+  InsufficientFundsException,
+} from '../core/core.service';
 import { InvestmentEntity } from './entities/investment.entity';
 import { IdempotencyService } from '../core/idempotency.service';
 
@@ -36,7 +47,7 @@ interface MarketQuote {
 @Injectable()
 export class InvestmentsService {
   private readonly logger = new Logger('BrokerageEngine');
-  
+
   // Cache de L1 em Memória para mitigar throttling no provedor de cotações (B3/Crypto)
   private readonly quoteCache = new Map<string, MarketQuote>();
   private readonly QUOTE_TTL_MS = 15000; // 15 segundos
@@ -50,8 +61,10 @@ export class InvestmentsService {
   ) {}
 
   async fetchCustodyPositions(neuralId: string) {
-    const positions = await this.custodyRepository.find({ where: { neural_id: neuralId } });
-    
+    const positions = await this.custodyRepository.find({
+      where: { neural_id: neuralId },
+    });
+
     if (positions.length === 0) {
       return [];
     }
@@ -69,9 +82,10 @@ export class InvestmentsService {
           averagePriceCents: Math.round(Number(pos.avg_price) * 100),
           currentPriceCents: quote.priceCents,
           totalValueCents: positionValueCents,
-          profitabilityPercentage: ((quote.priceCents / (Number(pos.avg_price) * 100)) - 1) * 100,
+          profitabilityPercentage:
+            (quote.priceCents / (Number(pos.avg_price) * 100) - 1) * 100,
         };
-      })
+      }),
     );
 
     return mtmPositions;
@@ -80,8 +94,11 @@ export class InvestmentsService {
   private async getMarketQuote(symbol: string): Promise<MarketQuote> {
     const now = new Date();
     const cached = this.quoteCache.get(symbol);
-    
-    if (cached && (now.getTime() - cached.lastUpdated.getTime()) < this.QUOTE_TTL_MS) {
+
+    if (
+      cached &&
+      now.getTime() - cached.lastUpdated.getTime() < this.QUOTE_TTL_MS
+    ) {
       return cached;
     }
 
@@ -89,18 +106,23 @@ export class InvestmentsService {
       // Integração real simulada com Data Provider (B3 API / CoinGecko Enterprise)
       const priceRaw = await this.fetchExternalQuote(symbol);
       const priceCents = Math.floor(priceRaw * 100);
-      
+
       const newQuote = { priceCents, lastUpdated: now };
       this.quoteCache.set(symbol, newQuote);
       return newQuote;
-
     } catch (error) {
-      this.logger.error(`[CRÍTICO] Falha ao obter cotação de mercado para ${symbol}: ${error.message}`);
+      this.logger.error(
+        `[CRÍTICO] Falha ao obter cotação de mercado para ${symbol}: ${error.message}`,
+      );
       if (cached) {
-        this.logger.warn(`Servindo cotação stale (vencida) para ${symbol} devido a indisponibilidade do provedor.`);
+        this.logger.warn(
+          `Servindo cotação stale (vencida) para ${symbol} devido a indisponibilidade do provedor.`,
+        );
         return cached;
       }
-      throw new InternalServerErrorException('Provedor de cotações indisponível. Negociações suspensas temporariamente.');
+      throw new InternalServerErrorException(
+        'Provedor de cotações indisponível. Negociações suspensas temporariamente.',
+      );
     }
   }
 
@@ -109,39 +131,68 @@ export class InvestmentsService {
     const isCrypto = ['BTC', 'ETH'].includes(symbol);
     if (isCrypto) {
       const id = symbol === 'BTC' ? 'bitcoin' : 'ethereum';
-      const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=brl`);
-      
+      const response = await fetch(
+        `https://api.coingecko.com/api/v3/simple/price?ids=${id}&vs_currencies=brl`,
+      );
+
       if (response.status === 429) throw new Error('RATE_LIMIT_COINGECKO');
       if (!response.ok) throw new Error('MARKET_DATA_UNAVAILABLE');
-      
+
       const data = await response.json();
       return data[id]?.brl || 0;
     }
 
     // Preços D1 para B3 (Mock seguro)
-    const stockMatrix: Record<string, number> = { PETR4: 38.45, VALE3: 65.20, IVVB11: 284.15, WEGE3: 40.10 };
-    if (!stockMatrix[symbol]) throw new BadRequestException(`Ativo ${symbol} não listado ou com negociação suspensa pela B3.`);
+    const stockMatrix: Record<string, number> = {
+      PETR4: 38.45,
+      VALE3: 65.2,
+      IVVB11: 284.15,
+      WEGE3: 40.1,
+    };
+    if (!stockMatrix[symbol])
+      throw new BadRequestException(
+        `Ativo ${symbol} não listado ou com negociação suspensa pela B3.`,
+      );
     return stockMatrix[symbol];
   }
 
   async findAll(neuralId: string) {
-    return this.custodyRepository.find({ where: { neural_id: neuralId } as any });
+    return this.custodyRepository.find({
+      where: { neural_id: neuralId } as any,
+    });
   }
 
-  async executeTrade(neuralId: string, symbol: string, quantity: number, type: 'BUY' | 'SELL', idempotencyKey: string) {
+  async executeTrade(
+    neuralId: string,
+    symbol: string,
+    quantity: number,
+    type: 'BUY' | 'SELL',
+    idempotencyKey: string,
+  ) {
     // Basic mock implementation to satisfy build
     return { status: 'EXECUTED', symbol, quantity, type, idempotencyKey };
   }
 
-  async executeTradeOrder(neuralId: string, symbol: string, quantity: number, orderType: 'BUY' | 'SELL', idempotencyKey?: string) {
+  async executeTradeOrder(
+    neuralId: string,
+    symbol: string,
+    quantity: number,
+    orderType: 'BUY' | 'SELL',
+    idempotencyKey?: string,
+  ) {
     if (quantity <= 0) {
       throw new BadRequestException('Quantidade da ordem inválida.');
     }
 
     if (idempotencyKey) {
-      const cachedTx = await this.idempotencyGuard.get(idempotencyKey, neuralId);
+      const cachedTx = await this.idempotencyGuard.get(
+        idempotencyKey,
+        neuralId,
+      );
       if (cachedTx) {
-        this.logger.log(`[Idempotência] Ordem de ${orderType} para ${symbol} repetida barrada.`);
+        this.logger.log(
+          `[Idempotência] Ordem de ${orderType} para ${symbol} repetida barrada.`,
+        );
         return cachedTx.body;
       }
       await this.idempotencyGuard.acquireLock(idempotencyKey, neuralId);
@@ -154,23 +205,26 @@ export class InvestmentsService {
 
       if (orderType === 'BUY') {
         // Débito no Ledger com concorrência segura
-        await this.coreService.debit(neuralId, totalVolumeCents, { 
-          type: 'BROKERAGE_BUY', 
+        await this.coreService.debit(neuralId, totalVolumeCents, {
+          type: 'BROKERAGE_BUY',
           counterpartyKey: symbol,
-          endToEndId: tradeId
+          endToEndId: tradeId,
         });
 
         // Conciliação de Custódia
-        let position = await this.custodyRepository.findOne({ where: { neural_id: neuralId, symbol } as any });
-        
+        const position = await this.custodyRepository.findOne({
+          where: { neural_id: neuralId, symbol } as any,
+        });
+
         if (position) {
           const currentQty = Number(position.quantity);
           const newQty = currentQty + quantity;
-          const currentTotalCents = currentQty * Math.round(Number(position.avg_price) * 100);
+          const currentTotalCents =
+            currentQty * Math.round(Number(position.avg_price) * 100);
           const newTotalCents = currentTotalCents + totalVolumeCents;
-          
+
           position.quantity = newQty;
-          position.avg_price = (newTotalCents / newQty) / 100;
+          position.avg_price = newTotalCents / newQty / 100;
           await this.custodyRepository.save(position);
         } else {
           await this.custodyRepository.save(
@@ -180,15 +234,18 @@ export class InvestmentsService {
               asset_type: ['BTC', 'ETH'].includes(symbol) ? 'CRYPTO' : 'EQUITY',
               quantity,
               avg_price: quote.priceCents / 100,
-            })
+            }),
           );
         }
-
       } else if (orderType === 'SELL') {
         // Validação de short-selling (não permitido)
-        const position = await this.custodyRepository.findOne({ where: { neural_id: neuralId, symbol } as any });
+        const position = await this.custodyRepository.findOne({
+          where: { neural_id: neuralId, symbol } as any,
+        });
         if (!position || Number(position.quantity) < quantity) {
-          throw new BadRequestException('Você não possui custódia suficiente para realizar esta venda a descoberto.');
+          throw new BadRequestException(
+            'Você não possui custódia suficiente para realizar esta venda a descoberto.',
+          );
         }
 
         const newQty = Number(position.quantity) - quantity;
@@ -200,14 +257,16 @@ export class InvestmentsService {
         }
 
         // Liquidação financeira T+0
-        await this.coreService.credit(neuralId, totalVolumeCents, { 
-          type: 'BROKERAGE_SELL', 
+        await this.coreService.credit(neuralId, totalVolumeCents, {
+          type: 'BROKERAGE_SELL',
           counterpartyKey: symbol,
-          endToEndId: tradeId
+          endToEndId: tradeId,
         });
       }
 
-      this.logger.log(`[BROKERAGE] Ordem ${orderType} liquidada. Ativo: ${symbol} | Qtd: ${quantity} | Vol: ${totalVolumeCents}c | User: ${neuralId}`);
+      this.logger.log(
+        `[BROKERAGE] Ordem ${orderType} liquidada. Ativo: ${symbol} | Qtd: ${quantity} | Vol: ${totalVolumeCents}c | User: ${neuralId}`,
+      );
 
       const receipt = {
         status: 'SETTLED',
@@ -221,18 +280,32 @@ export class InvestmentsService {
       };
 
       if (idempotencyKey) {
-        await this.idempotencyGuard.save(idempotencyKey, neuralId, '/investments/trade', 201, receipt);
+        await this.idempotencyGuard.save(
+          idempotencyKey,
+          neuralId,
+          '/investments/trade',
+          201,
+          receipt,
+        );
       }
 
       return receipt;
-
     } catch (error) {
-      if (idempotencyKey) await this.idempotencyGuard.releaseLock(idempotencyKey, neuralId);
-      if (error instanceof InsufficientFundsException || error instanceof BadRequestException || error instanceof FinancialSecurityException) {
+      if (idempotencyKey)
+        await this.idempotencyGuard.releaseLock(idempotencyKey, neuralId);
+      if (
+        error instanceof InsufficientFundsException ||
+        error instanceof BadRequestException ||
+        error instanceof FinancialSecurityException
+      ) {
         throw error;
       }
-      this.logger.error(`[FALHA LIQUIDAÇÃO] Erro sistêmico ao processar ordem de ${neuralId}: ${error.message}`);
-      throw new InternalServerErrorException('Falha ao rotear ordem para a bolsa de valores.');
+      this.logger.error(
+        `[FALHA LIQUIDAÇÃO] Erro sistêmico ao processar ordem de ${neuralId}: ${error.message}`,
+      );
+      throw new InternalServerErrorException(
+        'Falha ao rotear ordem para a bolsa de valores.',
+      );
     }
   }
 }

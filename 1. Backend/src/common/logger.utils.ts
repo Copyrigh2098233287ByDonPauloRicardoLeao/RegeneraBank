@@ -29,19 +29,22 @@ export class LogSanitizer {
    * Mascara dados PII (CPF, CNPJ, Email, Chave Aleatória, Telefone) na string de log.
    */
   static sanitize(message: string): string {
-    return message.replace(/(?:\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\S+@\S+\.\S+|\+?\d{10,14})/g, (match) => {
-      if (match.includes('@')) {
-        const [name, domain] = match.split('@');
-        return `${name.slice(0, 3)}***@${domain}`;
-      }
-      if (match.replace(/\D/g, '').length === 11) {
-        return `${match.slice(0, 3)}***${match.slice(-4)}`;
-      }
-      if (match.replace(/\D/g, '').length >= 10) {
-        return `${match.slice(0, 3)}***${match.slice(-4)}`;
-      }
-      return '***';
-    });
+    return message.replace(
+      /(?:\d{3}\.?\d{3}\.?\d{3}-?\d{2}|\S+@\S+\.\S+|\+?\d{10,14})/g,
+      (match) => {
+        if (match.includes('@')) {
+          const [name, domain] = match.split('@');
+          return `${name.slice(0, 3)}***@${domain}`;
+        }
+        if (match.replace(/\D/g, '').length === 11) {
+          return `${match.slice(0, 3)}***${match.slice(-4)}`;
+        }
+        if (match.replace(/\D/g, '').length >= 10) {
+          return `${match.slice(0, 3)}***${match.slice(-4)}`;
+        }
+        return '***';
+      },
+    );
   }
 
   static log(logger: Logger, message: string) {

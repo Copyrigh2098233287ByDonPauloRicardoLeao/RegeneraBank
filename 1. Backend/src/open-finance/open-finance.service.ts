@@ -20,7 +20,14 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { Injectable, Logger, HttpException, HttpStatus, BadRequestException, ForbiddenException } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  HttpException,
+  HttpStatus,
+  BadRequestException,
+  ForbiddenException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { randomUUID } from 'crypto';
 
@@ -52,17 +59,26 @@ export class OpenFinanceService {
    */
   private async secureFetch(url: string, init?: RequestInit): Promise<any> {
     // Validação de Mutual TLS (MTLS) seria injetada no agent HTTP aqui
-    this.logger.debug(`[MTLS Handshake] Conectando via túnel seguro para: ${url}`);
-    
+    this.logger.debug(
+      `[MTLS Handshake] Conectando via túnel seguro para: ${url}`,
+    );
+
     let res: Response;
     try {
       res = await fetch(url, {
         ...init,
-        headers: { 'X-API-Key': this.apiKey, Accept: 'application/json', ...init?.headers },
+        headers: {
+          'X-API-Key': this.apiKey,
+          Accept: 'application/json',
+          ...init?.headers,
+        },
         signal: AbortSignal.timeout(this.TIMEOUT_MS),
       });
     } catch (err: any) {
-      throw new HttpException('Falha na comunicação segura com o ecossistema Open Finance.', HttpStatus.GATEWAY_TIMEOUT);
+      throw new HttpException(
+        'Falha na comunicação segura com o ecossistema Open Finance.',
+        HttpStatus.GATEWAY_TIMEOUT,
+      );
     }
 
     const body = await res.json().catch(() => ({}));
@@ -75,7 +91,11 @@ export class OpenFinanceService {
   /**
    * Criação de Consentimento Formal (Fase 2 BACEN)
    */
-  async createConsent(neuralId: string, provider: string, ttlHours: number = 24): Promise<OpenFinanceConsent> {
+  async createConsent(
+    neuralId: string,
+    provider: string,
+    ttlHours: number = 24,
+  ): Promise<OpenFinanceConsent> {
     const expiresAt = new Date();
     expiresAt.setHours(expiresAt.getHours() + ttlHours);
 
@@ -89,7 +109,9 @@ export class OpenFinanceService {
     };
 
     this.consentVault.set(consent.id, consent);
-    this.logger.log(`[OPEN FINANCE] Consentimento criado: ${consent.id} (Validade: ${ttlHours}h)`);
+    this.logger.log(
+      `[OPEN FINANCE] Consentimento criado: ${consent.id} (Validade: ${ttlHours}h)`,
+    );
     return consent;
   }
 
@@ -99,10 +121,14 @@ export class OpenFinanceService {
   async revokeConsent(consentId: string, neuralId: string) {
     const consent = this.consentVault.get(consentId);
     if (!consent || consent.neuralId !== neuralId) {
-      throw new BadRequestException('Consentimento não localizado ou acesso negado.');
+      throw new BadRequestException(
+        'Consentimento não localizado ou acesso negado.',
+      );
     }
     consent.status = 'REVOKED';
-    this.logger.log(`[OPEN FINANCE] Consentimento revogado pelo usuário: ${consentId}`);
+    this.logger.log(
+      `[OPEN FINANCE] Consentimento revogado pelo usuário: ${consentId}`,
+    );
     return { status: 'REVOKED', consentId };
   }
 
@@ -112,11 +138,15 @@ export class OpenFinanceService {
   private validateConsent(consentId: string, neuralId: string) {
     const consent = this.consentVault.get(consentId);
     if (!consent || consent.neuralId !== neuralId) {
-      throw new ForbiddenException('Acesso negado: Consentimento Open Finance inválido.');
+      throw new ForbiddenException(
+        'Acesso negado: Consentimento Open Finance inválido.',
+      );
     }
     if (consent.status !== 'ACTIVE' || new Date() > consent.expiresAt) {
       consent.status = 'EXPIRED';
-      throw new ForbiddenException('Consentimento Open Finance expirado ou revogado.');
+      throw new ForbiddenException(
+        'Consentimento Open Finance expirado ou revogado.',
+      );
     }
     return consent;
   }
@@ -127,7 +157,13 @@ export class OpenFinanceService {
     return this.secureFetch(`${this.BASE_URL}/provider/`);
   }
 
-  async login(provider: string, username: string, password: string, consentId?: string, neuralId?: string) {
+  async login(
+    provider: string,
+    username: string,
+    password: string,
+    consentId?: string,
+    neuralId?: string,
+  ) {
     return { token: 'mock-token' };
   }
 
@@ -138,7 +174,13 @@ export class OpenFinanceService {
     return [];
   }
 
-  async getTransactions(key: string, accountId: string, currency: string, dateStart: string, dateEnd?: string) {
+  async getTransactions(
+    key: string,
+    accountId: string,
+    currency: string,
+    dateStart: string,
+    dateEnd?: string,
+  ) {
     return [];
   }
 
@@ -146,7 +188,11 @@ export class OpenFinanceService {
     return { success: true };
   }
 
-  async createPaymentLink(amount: number, description: string, currency: string) {
+  async createPaymentLink(
+    amount: number,
+    description: string,
+    currency: string,
+  ) {
     return { link: 'https://pay.regenerabank.app/mock' };
   }
 

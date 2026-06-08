@@ -138,7 +138,23 @@
 <a name='L73'></a><a href='#L73'>73</a>
 <a name='L74'></a><a href='#L74'>74</a>
 <a name='L75'></a><a href='#L75'>75</a>
-<a name='L76'></a><a href='#L76'>76</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
+<a name='L76'></a><a href='#L76'>76</a>
+<a name='L77'></a><a href='#L77'>77</a>
+<a name='L78'></a><a href='#L78'>78</a>
+<a name='L79'></a><a href='#L79'>79</a>
+<a name='L80'></a><a href='#L80'>80</a>
+<a name='L81'></a><a href='#L81'>81</a>
+<a name='L82'></a><a href='#L82'>82</a>
+<a name='L83'></a><a href='#L83'>83</a>
+<a name='L84'></a><a href='#L84'>84</a>
+<a name='L85'></a><a href='#L85'>85</a>
+<a name='L86'></a><a href='#L86'>86</a>
+<a name='L87'></a><a href='#L87'>87</a>
+<a name='L88'></a><a href='#L88'>88</a>
+<a name='L89'></a><a href='#L89'>89</a>
+<a name='L90'></a><a href='#L90'>90</a>
+<a name='L91'></a><a href='#L91'>91</a>
+<a name='L92'></a><a href='#L92'>92</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -194,22 +210,38 @@
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
@@ -264,27 +296,43 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 @Injectable()
 export <span class="fstat-no" title="function not covered" >class <span class="cstat-no" title="statement not covered" ><span class="cstat-no" title="statement not covered" >P</span>aymentLinksService<span class="cstat-no" title="statement not covered" > </span>{</span></span>
   private readonly <span class="cstat-no" title="statement not covered" >logger = new Logger(PaymentLinksService.name);</span>
-  
-  private readonly <span class="cstat-no" title="statement not covered" >PROMETEO_API_KEY = process.env.PROMETEO_API_KEY; </span>// from Secret Manager only - never hardcoded
-  private readonly <span class="cstat-no" title="statement not covered" >PROMETEO_BASE_URL = 'https://banking.sandbox.prometeoapi.com';</span>
 &nbsp;
-<span class="fstat-no" title="function not covered" >  async </span>createPaymentLink(neuralId: string, amount: number, description?: string) {
-<span class="cstat-no" title="statement not covered" >    this.logger.log(`Creating Payment Link via Prometeo for ${neuralId}: R$ ${amount}`);</span>
+  private readonly <span class="cstat-no" title="statement not covered" >PROMETEO_API_KEY = process.env.PROMETEO_API_KEY; </span>// from Secret Manager only - never hardcoded
+  private readonly <span class="cstat-no" title="statement not covered" >PROMETEO_BASE_URL =</span>
+    'https://banking.sandbox.prometeoapi.com';
+&nbsp;
+<span class="fstat-no" title="function not covered" >  async </span>createPaymentLink(
+    neuralId: string,
+    amount: number,
+    description?: string,
+  ) {
+<span class="cstat-no" title="statement not covered" >    this.logger.log(</span>
+      `Creating Payment Link via Prometeo for ${neuralId}: R$ ${amount}`,
+    );
 &nbsp;
 <span class="cstat-no" title="statement not covered" >    <span class="missing-if-branch" title="if path not taken" >I</span>if (!this.PROMETEO_API_KEY) {</span>
-<span class="cstat-no" title="statement not covered" >      throw new Error('PROMETEO_API_KEY must come from Secret Manager (injected in Cloud Run)');</span>
+<span class="cstat-no" title="statement not covered" >      throw new Error(</span>
+        'PROMETEO_API_KEY must come from Secret Manager (injected in Cloud Run)',
+      );
     }
 <span class="cstat-no" title="statement not covered" >    try {</span>
       // Real Prometeo call (key from SM)
       const response = <span class="cstat-no" title="statement not covered" >await axios.post(</span>
         `${this.PROMETEO_BASE_URL}/payment-links/`,
-        { amount, description: description || 'Regenera Link', currency: 'BRL' },
-        { headers: { 'X-API-Key': this.PROMETEO_API_KEY } }
+        {
+          amount,
+          description: description || 'Regenera Link',
+          currency: 'BRL',
+        },
+        { headers: { 'X-API-Key': this.PROMETEO_API_KEY } },
       );
 <span class="cstat-no" title="statement not covered" >      return response.data;</span>
     } catch (error) {
 <span class="cstat-no" title="statement not covered" >      this.logger.error('Prometeo Payment Links API Integration Error', error);</span>
-<span class="cstat-no" title="statement not covered" >      throw new HttpException('Falha ao gerar link de pagamento.', HttpStatus.INTERNAL_SERVER_ERROR);</span>
+<span class="cstat-no" title="statement not covered" >      throw new HttpException(</span>
+        'Falha ao gerar link de pagamento.',
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
   }
 }
@@ -295,7 +343,7 @@ export <span class="fstat-no" title="function not covered" >class <span class="c
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2026-06-08T20:37:33.419Z
+                at 2026-06-08T20:47:23.773Z
             </div>
         <script src="../../../prettify.js"></script>
         <script>

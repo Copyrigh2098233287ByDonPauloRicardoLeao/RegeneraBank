@@ -23,7 +23,15 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 // |---------------------------------------------------------------------------------------|
 // |  --> REGENERA ENTERPRISE SYSTEM v4.0                                                  |
 // |---------------------------------------------------------------------------------------|
-import { Controller, Get, Post, Body, Req, UseGuards, UnauthorizedException } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Req,
+  UseGuards,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { NeuralService } from './neural.service';
 import { NeuralAuthGuard } from '../auth/auth.guard';
 
@@ -34,7 +42,8 @@ export class NeuralController {
 
   private getNeuralId(req: any): string {
     const neuralId = req.user?.sub || req.user?.neuralId;
-    if (!neuralId) throw new UnauthorizedException('Identidade Neural não identificada.');
+    if (!neuralId)
+      throw new UnauthorizedException('Identidade Neural não identificada.');
     return neuralId;
   }
 
@@ -45,12 +54,18 @@ export class NeuralController {
 
   @Post('process')
   async processInteraction(@Body() body: { prompt: string }, @Req() req: any) {
-    return this.neuralService.processInteraction(this.getNeuralId(req), body.prompt);
+    return this.neuralService.processInteraction(
+      this.getNeuralId(req),
+      body.prompt,
+    );
   }
 
   @Post('tts')
   async textToSpeech(@Body() body: { text: string }, @Req() req: any) {
-    const result = await this.neuralService.processInteraction(this.getNeuralId(req), `Speak this text naturally: ${body.text}`);
+    const result = await this.neuralService.processInteraction(
+      this.getNeuralId(req),
+      `Speak this text naturally: ${body.text}`,
+    );
     return { audioBase64: result.audioBase64 || null };
   }
 }

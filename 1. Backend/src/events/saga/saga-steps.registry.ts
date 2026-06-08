@@ -34,30 +34,31 @@ export class SagaStepsRegistry {
       {
         name: 'VALIDATION',
         execute: async (data) => {
-          if (!data.amount || data.amount <= 0) throw new Error('Invalid amount');
-        }
+          if (!data.amount || data.amount <= 0)
+            throw new Error('Invalid amount');
+        },
       },
       {
         name: 'BALANCE_RESERVATION',
         execute: async (data) => {
           // Logic for reserving balance in Ledger
           console.log(`Reserving ${data.amount} for ${data.userId}`);
-        }
+        },
       },
       {
         name: 'EXTERNAL_SETTLEMENT',
         execute: async (data) => {
           // Call external BaaS API
           console.log(`Calling external PIX provider for ${data.id}`);
-        }
+        },
       },
       {
         name: 'LEDGER_CONFIRMATION',
         execute: async (data) => {
           // Commit transaction in Ledger
           console.log(`Finalizing ledger for ${data.id}`);
-        }
-      }
+        },
+      },
     ];
   }
 }

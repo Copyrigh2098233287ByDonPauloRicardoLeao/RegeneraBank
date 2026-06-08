@@ -43,12 +43,12 @@ import { OutboxEventEntity } from './entities/outbox-event.entity';
   imports: [
     forwardRef(() => AuthModule),
     TypeOrmModule.forFeature([
-      UserEntity, 
-      AccountEntity, 
-      TransactionEntity, 
-      PixKeyEntity, 
+      UserEntity,
+      AccountEntity,
+      TransactionEntity,
+      PixKeyEntity,
       IdempotencyLogEntity,
-      OutboxEventEntity
+      OutboxEventEntity,
     ]),
   ],
   controllers: [CoreController, PixController],

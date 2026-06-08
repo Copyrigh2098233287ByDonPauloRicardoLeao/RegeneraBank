@@ -42,24 +42,29 @@ describe('Pix Concurrency & Idempotency Test', () => {
           provide: IdempotencyService,
           useValue: {
             acquireLock: jest.fn().mockImplementation(async () => {
-              if (locked) throw new ConflictException('Transação já processada ou em andamento.');
+              if (locked)
+                throw new ConflictException(
+                  'Transação já processada ou em andamento.',
+                );
               locked = true;
             }),
             get: jest.fn().mockResolvedValue(null),
             save: jest.fn(),
-          }
+          },
         },
         {
           provide: CoreService,
           useValue: {
-            executePixAtomic: jest.fn().mockResolvedValue({ senderNewBalance: 1000 })
-          }
+            executePixAtomic: jest
+              .fn()
+              .mockResolvedValue({ senderNewBalance: 1000 }),
+          },
         },
         {
           provide: PixEventsGateway,
           useValue: {
-            broadcastPixEvent: jest.fn()
-          }
+            broadcastPixEvent: jest.fn(),
+          },
         },
         {
           provide: getRepositoryToken(PixKeyEntity),
@@ -67,7 +72,7 @@ describe('Pix Concurrency & Idempotency Test', () => {
             find: jest.fn(),
             create: jest.fn(),
             save: jest.fn(),
-          }
+          },
         },
         {
           provide: getRepositoryToken(AccountEntity),
@@ -84,25 +89,25 @@ describe('Pix Concurrency & Idempotency Test', () => {
   it('deve processar apenas 1 transação PIX com sucesso e rejeitar 9 (409 Conflict)', async () => {
     const idempotencyKey = `pix-test-key-${Date.now()}`;
     const neuralId = 'TEST-USER-123';
-    
-    const promises = Array.from({ length: 10 }).map(() => 
-      pixService.executePix(neuralId, 'receiver@test.com', 100, idempotencyKey)
+
+    const promises = Array.from({ length: 10 }).map(() =>
+      pixService
+        .executePix(neuralId, 'receiver@test.com', 100, idempotencyKey)
         .then(() => 'SUCCESS')
         .catch((err) => {
           if (err instanceof ConflictException) {
             return 'CONFLICT';
           }
           return 'OTHER_ERROR';
-        })
+        }),
     );
 
     const results = await Promise.all(promises);
 
-    const successes = results.filter(r => r === 'SUCCESS').length;
-    const conflicts = results.filter(r => r === 'CONFLICT').length;
+    const successes = results.filter((r) => r === 'SUCCESS').length;
+    const conflicts = results.filter((r) => r === 'CONFLICT').length;
 
     expect(successes).toBe(1);
     expect(conflicts).toBe(9);
   });
 });
-

@@ -25,19 +25,21 @@ import { Logger } from '@nestjs/common';
 export async function withRetry<T>(
   operation: () => Promise<T>,
   retries: number = 3,
-  delay: number = 1000
+  delay: number = 1000,
 ): Promise<T> {
   const logger = new Logger('NeonRetry');
-  
+
   for (let i = 0; i < retries; i++) {
     try {
       return await operation();
     } catch (error) {
       if (i === retries - 1) throw error;
-      
+
       const waitTime = delay * Math.pow(2, i);
-      logger.warn(`Connection failed. Retrying in ${waitTime}ms... (Attempt ${i + 1}/${retries})`);
-      await new Promise(resolve => setTimeout(resolve, waitTime));
+      logger.warn(
+        `Connection failed. Retrying in ${waitTime}ms... (Attempt ${i + 1}/${retries})`,
+      );
+      await new Promise((resolve) => setTimeout(resolve, waitTime));
     }
   }
   throw new Error('Operation failed after max retries');

@@ -55,7 +55,7 @@ export class ComplianceController {
   @HttpCode(HttpStatus.OK)
   async validateCpf(@Body() body: ValidateCpfDto) {
     if (!body.document_number) {
-       return { error: 'O CPF é obrigatório.' };
+      return { error: 'O CPF é obrigatório.' };
     }
     return this.identityService.validateCpf(body.document_number);
   }

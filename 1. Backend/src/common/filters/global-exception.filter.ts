@@ -20,7 +20,14 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus, Logger } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  Logger,
+} from '@nestjs/common';
 import { Request, Response } from 'express';
 import { randomUUID } from 'crypto';
 
@@ -35,7 +42,9 @@ export class GlobalExceptionFilter implements ExceptionFilter {
     const traceId = request.headers['x-trace-id'] || randomUUID();
 
     const isHttpException = exception instanceof HttpException;
-    const status = isHttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
+    const status = isHttpException
+      ? exception.getStatus()
+      : HttpStatus.INTERNAL_SERVER_ERROR;
 
     let errorResponse: any;
 
@@ -47,15 +56,19 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       // Erro desconhecido (Crash, Type Error, DB Timeout) - Impede vazamento de Stack Trace
       errorResponse = {
         error: 'INTERNAL_SERVER_ERROR',
-        message: 'Ocorreu um erro interno de processamento. A operação foi abortada de forma segura.',
+        message:
+          'Ocorreu um erro interno de processamento. A operação foi abortada de forma segura.',
       };
     }
 
     // Log estruturado corporativo
     const logMessage = `[Trace: ${traceId}] HTTP ${status} | Path: ${request.url} | Error: ${exception instanceof Error ? exception.message : 'Unknown'}`;
-    
+
     if (status >= 500) {
-      this.logger.error(logMessage, exception instanceof Error ? exception.stack : '');
+      this.logger.error(
+        logMessage,
+        exception instanceof Error ? exception.stack : '',
+      );
     } else {
       this.logger.warn(logMessage);
     }

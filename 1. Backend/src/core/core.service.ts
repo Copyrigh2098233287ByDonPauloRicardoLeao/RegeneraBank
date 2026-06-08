@@ -20,7 +20,14 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 |---------------------------------------------------------------------------------------|
 */
 
-import { Injectable, Logger, BadRequestException, OnModuleInit, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  BadRequestException,
+  OnModuleInit,
+  HttpException,
+  HttpStatus,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource, QueryRunner } from 'typeorm';
 import { v4 as uuidv4 } from 'uuid';
@@ -39,7 +46,13 @@ export class FinancialSecurityException extends HttpException {
 
 export class InsufficientFundsException extends HttpException {
   constructor() {
-    super({ error: 'INSUFFICIENT_FUNDS', message: 'Saldo insuficiente para a operação contábil.' }, HttpStatus.UNPROCESSABLE_ENTITY);
+    super(
+      {
+        error: 'INSUFFICIENT_FUNDS',
+        message: 'Saldo insuficiente para a operação contábil.',
+      },
+      HttpStatus.UNPROCESSABLE_ENTITY,
+    );
   }
 }
 
@@ -59,7 +72,9 @@ export class CoreService implements OnModuleInit {
   }
 
   async onModuleInit() {
-    this.logger.log('Inicializando Core Financeiro. Ledger ACID Ativo. Bloqueio Pessimista Habilitado.');
+    this.logger.log(
+      'Inicializando Core Financeiro. Ledger ACID Ativo. Bloqueio Pessimista Habilitado.',
+    );
     // Mocks de inicialização (como seed accounts fixas) foram removidos para adequação à produção real.
   }
 
@@ -67,15 +82,28 @@ export class CoreService implements OnModuleInit {
    * Resolve e valida conta-corrente na base ACID.
    * Não cria contas sob demanda para não poluir o banco com IDs fantasmas se for ataque DDoS.
    */
-  private async getActiveAccountStrict(neuralId: string): Promise<AccountEntity> {
+  private async getActiveAccountStrict(
+    neuralId: string,
+  ): Promise<AccountEntity> {
     const account = await this.accountRepo.findOne({ where: { neuralId } });
     if (!account) {
-      this.logger.warn(`Tentativa de acesso a conta inexistente ou bloqueada via neuralId: ${neuralId}`);
-      throw new FinancialSecurityException('Conta-corrente não localizada ou bloqueada pelo BACEN.', 'ACC_NOT_FOUND');
+      this.logger.warn(
+        `Tentativa de acesso a conta inexistente ou bloqueada via neuralId: ${neuralId}`,
+      );
+      throw new FinancialSecurityException(
+        'Conta-corrente não localizada ou bloqueada pelo BACEN.',
+        'ACC_NOT_FOUND',
+      );
     }
     // Verificação KYC / Status Judicial em tempo de execução
-    if (account.status === 'BLOCKED_JUDICIAL' || account.status === 'SUSPENDED') {
-      throw new FinancialSecurityException('Conta sob bloqueio judicial/cautelar. Operação suspensa.', 'ACC_BLOCKED');
+    if (
+      account.status === 'BLOCKED_JUDICIAL' ||
+      account.status === 'SUSPENDED'
+    ) {
+      throw new FinancialSecurityException(
+        'Conta sob bloqueio judicial/cautelar. Operação suspensa.',
+        'ACC_BLOCKED',
+      );
     }
     return account;
   }
@@ -96,7 +124,9 @@ export class CoreService implements OnModuleInit {
       const repo = queryRunner.manager.getRepository(AccountEntity);
 
       // Trava a linha da conta no banco de dados até o COMMIT/ROLLBACK
-      let qb = repo.createQueryBuilder('account').where('account.neuralId = :neuralId', { neuralId });
+      let qb = repo
+        .createQueryBuilder('account')
+        .where('account.neuralId = :neuralId', { neuralId });
       if (this.dataSource.options.type !== 'sqlite') {
         qb = qb.setLock('pessimistic_write');
       }
@@ -104,19 +134,26 @@ export class CoreService implements OnModuleInit {
       const account = await qb.getOne();
 
       if (!account) {
-        throw new FinancialSecurityException('Conta-corrente inválida para lock atômico.', 'ACC_LOCK_FAIL');
+        throw new FinancialSecurityException(
+          'Conta-corrente inválida para lock atômico.',
+          'ACC_LOCK_FAIL',
+        );
       }
 
       if (account.status !== 'ACTIVE') {
-        throw new FinancialSecurityException('Transação negada. Situação cadastral irregular.', 'ACC_INACTIVE');
+        throw new FinancialSecurityException(
+          'Transação negada. Situação cadastral irregular.',
+          'ACC_INACTIVE',
+        );
       }
 
       const result = await operation(account, queryRunner);
       await queryRunner.commitTransaction();
       return result;
-
     } catch (error) {
-      this.logger.error(`[ROLLBACK ACIONADO] Falha atômica na conta ${neuralId}: ${error.message}`);
+      this.logger.error(
+        `[ROLLBACK ACIONADO] Falha atômica na conta ${neuralId}: ${error.message}`,
+      );
       await queryRunner.rollbackTransaction();
       throw error;
     } finally {
@@ -141,7 +178,8 @@ export class CoreService implements OnModuleInit {
       recentTransactions: recentTxs.map((t) => ({
         id: t.id,
         type: t.type,
-        counterparty: t.counterpartyName || t.counterpartyKey || 'Operação Interna',
+        counterparty:
+          t.counterpartyName || t.counterpartyKey || 'Operação Interna',
         amount: Number(t.amountCents) / 100,
         e2eId: t.endToEndId,
         settledAt: t.createdAt.toISOString(),
@@ -149,111 +187,208 @@ export class CoreService implements OnModuleInit {
     };
   }
 
-  
-  private async recordLedgerEntry(queryRunner: any, accountId: string, amountCents: number, balanceAfterCents: number, type: string, meta?: Partial<TransactionEntity>) {
+  private async recordLedgerEntry(
+    queryRunner: any,
+    accountId: string,
+    amountCents: number,
+    balanceAfterCents: number,
+    type: string,
+    meta?: Partial<TransactionEntity>,
+  ) {
     const txRepo = queryRunner.manager.getRepository(TransactionEntity);
     const outboxRepo = queryRunner.manager.getRepository(OutboxEventEntity);
-    const lastTx = await txRepo.createQueryBuilder('tx').where('tx.accountId = :accountId', { accountId }).orderBy('tx.createdAt', 'DESC').getOne();
+    const lastTx = await txRepo
+      .createQueryBuilder('tx')
+      .where('tx.accountId = :accountId', { accountId })
+      .orderBy('tx.createdAt', 'DESC')
+      .getOne();
     const previousHash = lastTx?.hash || 'GENESIS_HASH';
     const idempotencyKey = meta?.idempotencyKey || null;
     const createdAt = new Date();
     const rawString = `${previousHash}|${accountId}|${amountCents}|${type}|${idempotencyKey}|${createdAt.toISOString()}`;
     const hash = createHash('sha256').update(rawString).digest('hex');
-    const entry = txRepo.create({ accountId, amountCents, balanceAfterCents, type, status: 'SETTLED', counterpartyName: meta?.counterpartyName, counterpartyKey: meta?.counterpartyKey, endToEndId: meta?.endToEndId, idempotencyKey, previousHash, hash, createdAt });
+    const entry = txRepo.create({
+      accountId,
+      amountCents,
+      balanceAfterCents,
+      type,
+      status: 'SETTLED',
+      counterpartyName: meta?.counterpartyName,
+      counterpartyKey: meta?.counterpartyKey,
+      endToEndId: meta?.endToEndId,
+      idempotencyKey,
+      previousHash,
+      hash,
+      createdAt,
+    });
     await txRepo.save(entry);
-    await outboxRepo.save(outboxRepo.create({ topic: 'ledger.transaction.settled', payload: { transactionId: entry.id, accountId, amountCents, balanceAfterCents, type, hash } }));
+    await outboxRepo.save(
+      outboxRepo.create({
+        topic: 'ledger.transaction.settled',
+        payload: {
+          transactionId: entry.id,
+          accountId,
+          amountCents,
+          balanceAfterCents,
+          type,
+          hash,
+        },
+      }),
+    );
     return entry;
   }
 
   async freezeAccount(neuralId: string, reason: string): Promise<void> {
-    this.logger.warn(`[BLOQUEIO JUDICIAL/COMPLIANCE] Congelando conta ${neuralId}. Motivo: ${reason}`);
-    
-    await this.executeAtomicOperation(neuralId, async (account, queryRunner) => {
-      account.status = 'BLOCKED_JUDICIAL';
-      await queryRunner.manager.getRepository(AccountEntity).save(account);
-      
-      await this.recordLedgerEntry(queryRunner, account.id, 0, Number(account.balanceCents), 'ACCOUNT_FROZEN', { counterpartyName: 'BACEN / COAF', endToEndId: `FREEZE_${Date.now()}` });
-      
-      return true;
-    });
+    this.logger.warn(
+      `[BLOQUEIO JUDICIAL/COMPLIANCE] Congelando conta ${neuralId}. Motivo: ${reason}`,
+    );
+
+    await this.executeAtomicOperation(
+      neuralId,
+      async (account, queryRunner) => {
+        account.status = 'BLOCKED_JUDICIAL';
+        await queryRunner.manager.getRepository(AccountEntity).save(account);
+
+        await this.recordLedgerEntry(
+          queryRunner,
+          account.id,
+          0,
+          Number(account.balanceCents),
+          'ACCOUNT_FROZEN',
+          {
+            counterpartyName: 'BACEN / COAF',
+            endToEndId: `FREEZE_${Date.now()}`,
+          },
+        );
+
+        return true;
+      },
+    );
   }
 
   async getBalance(neuralId: string) {
     const account = await this.getActiveAccountStrict(neuralId);
-    return { globalBalance: Number(account.balanceCents) / 100, isLocked: account.status !== 'ACTIVE' };
+    return {
+      globalBalance: Number(account.balanceCents) / 100,
+      isLocked: account.status !== 'ACTIVE',
+    };
   }
 
   /**
    * Débito Transacional: Redução de saldo com criação de comprovante imutável.
    */
-  async debit(neuralId: string, amountCents: number, meta?: Partial<TransactionEntity>): Promise<number> {
+  async debit(
+    neuralId: string,
+    amountCents: number,
+    meta?: Partial<TransactionEntity>,
+  ): Promise<number> {
     if (meta?.idempotencyKey) {
-      const existing = await this.txRepo.findOne({ where: { idempotencyKey: meta.idempotencyKey } as any });
+      const existing = await this.txRepo.findOne({
+        where: { idempotencyKey: meta.idempotencyKey } as any,
+      });
       if (existing) {
-        this.logger.log(`[Idempotência] Requisão duplicada barrada no dédito: ${meta.idempotencyKey}`);
+        this.logger.log(
+          `[Idempotência] Requisão duplicada barrada no dédito: ${meta.idempotencyKey}`,
+        );
         const acc = await this.getActiveAccountStrict(neuralId);
         return Number(acc.balanceCents) / 100;
       }
     }
 
-    return this.executeAtomicOperation(neuralId, async (account, queryRunner) => {
-      const balanceCents = Number(account.balanceCents);
+    return this.executeAtomicOperation(
+      neuralId,
+      async (account, queryRunner) => {
+        const balanceCents = Number(account.balanceCents);
 
-      if (balanceCents < amountCents) {
-        throw new InsufficientFundsException();
-      }
+        if (balanceCents < amountCents) {
+          throw new InsufficientFundsException();
+        }
 
-      const newBalanceCents = balanceCents - amountCents;
-      account.balanceCents = newBalanceCents;
-      
-      await queryRunner.manager.getRepository(AccountEntity).save(account);
+        const newBalanceCents = balanceCents - amountCents;
+        account.balanceCents = newBalanceCents;
 
-      await this.recordLedgerEntry(queryRunner, account.id, -amountCents, newBalanceCents, meta?.type || 'DEBIT', meta);
+        await queryRunner.manager.getRepository(AccountEntity).save(account);
 
-      this.logger.log(`[LEDGER OUT] Conta ${account.accountNumber} debitada em ${amountCents/100}. Novo saldo: ${newBalanceCents/100}`);
-      return newBalanceCents / 100;
-    });
+        await this.recordLedgerEntry(
+          queryRunner,
+          account.id,
+          -amountCents,
+          newBalanceCents,
+          meta?.type || 'DEBIT',
+          meta,
+        );
+
+        this.logger.log(
+          `[LEDGER OUT] Conta ${account.accountNumber} debitada em ${amountCents / 100}. Novo saldo: ${newBalanceCents / 100}`,
+        );
+        return newBalanceCents / 100;
+      },
+    );
   }
 
   /**
    * Crédito Transacional: Aumento de saldo com comprovante imutável.
    */
-  async credit(neuralId: string, amountCents: number, meta?: Partial<TransactionEntity>): Promise<number> {
+  async credit(
+    neuralId: string,
+    amountCents: number,
+    meta?: Partial<TransactionEntity>,
+  ): Promise<number> {
     if (meta?.idempotencyKey) {
-      const existing = await this.txRepo.findOne({ where: { idempotencyKey: meta.idempotencyKey } as any });
+      const existing = await this.txRepo.findOne({
+        where: { idempotencyKey: meta.idempotencyKey } as any,
+      });
       if (existing) {
-        this.logger.log(`[Idempotência] Requisão duplicada barrada no crédito: ${meta.idempotencyKey}`);
+        this.logger.log(
+          `[Idempotência] Requisão duplicada barrada no crédito: ${meta.idempotencyKey}`,
+        );
         const acc = await this.accountRepo.findOne({ where: { neuralId } });
         return acc ? Number(acc.balanceCents) / 100 : 0;
       }
     }
 
-    return this.executeAtomicOperation(neuralId, async (account, queryRunner) => {
-      const balanceCents = Number(account.balanceCents);
+    return this.executeAtomicOperation(
+      neuralId,
+      async (account, queryRunner) => {
+        const balanceCents = Number(account.balanceCents);
 
-      const newBalanceCents = balanceCents + amountCents;
-      account.balanceCents = newBalanceCents;
-      
-      await queryRunner.manager.getRepository(AccountEntity).save(account);
+        const newBalanceCents = balanceCents + amountCents;
+        account.balanceCents = newBalanceCents;
 
-      await this.recordLedgerEntry(queryRunner, account.id, amountCents, newBalanceCents, meta?.type || 'CREDIT', meta);
+        await queryRunner.manager.getRepository(AccountEntity).save(account);
 
-      this.logger.log(`[LEDGER IN] Conta ${account.accountNumber} creditada em ${amountCents/100}. Novo saldo: ${newBalanceCents/100}`);
-      return newBalanceCents / 100;
-    });
+        await this.recordLedgerEntry(
+          queryRunner,
+          account.id,
+          amountCents,
+          newBalanceCents,
+          meta?.type || 'CREDIT',
+          meta,
+        );
+
+        this.logger.log(
+          `[LEDGER IN] Conta ${account.accountNumber} creditada em ${amountCents / 100}. Novo saldo: ${newBalanceCents / 100}`,
+        );
+        return newBalanceCents / 100;
+      },
+    );
   }
 
   async calculateDailyVolume(accountId: string): Promise<number> {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
-    const txs = await this.txRepo.createQueryBuilder('tx')
+    const txs = await this.txRepo
+      .createQueryBuilder('tx')
       .where('tx.accountId = :accountId', { accountId })
       .andWhere('tx.amountCents < 0')
       .andWhere('tx.createdAt >= :today', { today })
       .getMany();
 
-    const volumeCents = txs.reduce((sum, tx) => sum + Math.abs(Number(tx.amountCents)), 0);
+    const volumeCents = txs.reduce(
+      (sum, tx) => sum + Math.abs(Number(tx.amountCents)),
+      0,
+    );
     return volumeCents;
   }
 
@@ -272,20 +407,33 @@ export class CoreService implements OnModuleInit {
       // Lock Ordenado para evitar Deadlocks (ordena IDs lexicalmente)
       const lockOrder = [senderId, receiverId].sort();
 
-      const accountA = await accountRepo.createQueryBuilder('a').where('a.neuralId = :id', { id: lockOrder[0] }).setLock('pessimistic_write').getOne();
-      const accountB = await accountRepo.createQueryBuilder('a').where('a.neuralId = :id', { id: lockOrder[1] }).setLock('pessimistic_write').getOne();
+      const accountA = await accountRepo
+        .createQueryBuilder('a')
+        .where('a.neuralId = :id', { id: lockOrder[0] })
+        .setLock('pessimistic_write')
+        .getOne();
+      const accountB = await accountRepo
+        .createQueryBuilder('a')
+        .where('a.neuralId = :id', { id: lockOrder[1] })
+        .setLock('pessimistic_write')
+        .getOne();
 
-      if (!accountA || !accountB) throw new FinancialSecurityException('Falha de consistência: Conta de destino ou origem inválida.');
+      if (!accountA || !accountB)
+        throw new FinancialSecurityException(
+          'Falha de consistência: Conta de destino ou origem inválida.',
+        );
 
       const sender = senderId === lockOrder[0] ? accountA : accountB;
       const receiver = receiverId === lockOrder[0] ? accountA : accountB;
 
       if (sender.status !== 'ACTIVE' || receiver.status !== 'ACTIVE') {
-        throw new FinancialSecurityException('Operação bloqueada. Uma das contas envolvidas está inativa.');
+        throw new FinancialSecurityException(
+          'Operação bloqueada. Uma das contas envolvidas está inativa.',
+        );
       }
 
       const senderBalanceCents = Number(sender.balanceCents);
-      
+
       if (senderBalanceCents < amountCents) {
         throw new InsufficientFundsException();
       }
@@ -299,26 +447,59 @@ export class CoreService implements OnModuleInit {
       const e2eInternal = `I${Date.now()}`;
 
       // Comprovantes Imutáveis
-      await this.recordLedgerEntry(queryRunner, sender.id, -amountCents, sender.balanceCents, 'INTERNAL_TED_OUT', { counterpartyKey: receiverId, endToEndId: e2eInternal });
-      await this.recordLedgerEntry(queryRunner, receiver.id, amountCents, receiver.balanceCents, 'INTERNAL_TED_IN', { counterpartyKey: senderId, endToEndId: e2eInternal });
+      await this.recordLedgerEntry(
+        queryRunner,
+        sender.id,
+        -amountCents,
+        sender.balanceCents,
+        'INTERNAL_TED_OUT',
+        { counterpartyKey: receiverId, endToEndId: e2eInternal },
+      );
+      await this.recordLedgerEntry(
+        queryRunner,
+        receiver.id,
+        amountCents,
+        receiver.balanceCents,
+        'INTERNAL_TED_IN',
+        { counterpartyKey: senderId, endToEndId: e2eInternal },
+      );
 
       await queryRunner.commitTransaction();
-      this.logger.log(`[TED COMPLETA] Transferência ${e2eInternal} liquidada. Valor: ${amountCents/100}. Origem: ${senderId}`);
+      this.logger.log(
+        `[TED COMPLETA] Transferência ${e2eInternal} liquidada. Valor: ${amountCents / 100}. Origem: ${senderId}`,
+      );
 
-      return { status: 'SETTLED_INTERNAL', amount: amountCents / 100, endToEndId: e2eInternal, timestamp: new Date().toISOString() };
-
+      return {
+        status: 'SETTLED_INTERNAL',
+        amount: amountCents / 100,
+        endToEndId: e2eInternal,
+        timestamp: new Date().toISOString(),
+      };
     } catch (error) {
       await queryRunner.rollbackTransaction();
-      this.logger.error(`[CRÍTICO] Falha no assentamento de TED entre ${senderId} e ${receiverId}. Rollback executado. Erro: ${error.message}`);
+      this.logger.error(
+        `[CRÍTICO] Falha no assentamento de TED entre ${senderId} e ${receiverId}. Rollback executado. Erro: ${error.message}`,
+      );
       throw error;
     } finally {
       await queryRunner.release();
     }
   }
 
-  async executePixAtomic(senderNeuralId: string, receiverKey: string, amountCents: number, meta: { endToEndId: string; idempotencyKey?: string; typeOut?: string; typeIn?: string }) {
+  async executePixAtomic(
+    senderNeuralId: string,
+    receiverKey: string,
+    amountCents: number,
+    meta: {
+      endToEndId: string;
+      idempotencyKey?: string;
+      typeOut?: string;
+      typeIn?: string;
+    },
+  ) {
     // Delegado de Pix para TED interno caso a chave pertença a uma conta do mesmo ecossistema (Routing Inteligente)
-    const isInternalRouting = receiverKey.includes('RG-') || receiverKey.startsWith('0001');
+    const isInternalRouting =
+      receiverKey.includes('RG-') || receiverKey.startsWith('0001');
 
     if (isInternalRouting) {
       return this.transfer(senderNeuralId, receiverKey, amountCents);
@@ -332,11 +513,18 @@ export class CoreService implements OnModuleInit {
       idempotencyKey: meta.idempotencyKey,
     });
 
-    return { status: 'DEBITED_SPI_READY', amount: amountCents/100, senderNewBalance: newBalance, timestamp: new Date().toISOString() };
+    return {
+      status: 'DEBITED_SPI_READY',
+      amount: amountCents / 100,
+      senderNewBalance: newBalance,
+      timestamp: new Date().toISOString(),
+    };
   }
 
   async revealCardCvv(neuralId: string, cardId: string) {
-    this.logger.log(`[AUDIT] Acesso autorizado ao Secret Manager via IAM: Cartão ${cardId} solicitado por ${neuralId}`);
+    this.logger.log(
+      `[AUDIT] Acesso autorizado ao Secret Manager via IAM: Cartão ${cardId} solicitado por ${neuralId}`,
+    );
     try {
       const name = `projects/${process.env.GCP_PROJECT_ID}/secrets/CARD_CVV_${cardId}/versions/latest`;
       const [version] = await this.secretsClient.accessSecretVersion({ name });
@@ -344,8 +532,12 @@ export class CoreService implements OnModuleInit {
       if (!payload) throw new Error('Cofre retornou payload vazio.');
       return { cvv: payload };
     } catch (error) {
-      this.logger.error(`Vazamento prevenido ou falha de infra no cofre de segredos: ${error.message}`);
-      throw new FinancialSecurityException('Cofre criptográfico temporariamente indisponível. Acesso bloqueado.');
+      this.logger.error(
+        `Vazamento prevenido ou falha de infra no cofre de segredos: ${error.message}`,
+      );
+      throw new FinancialSecurityException(
+        'Cofre criptográfico temporariamente indisponível. Acesso bloqueado.',
+      );
     }
   }
 }

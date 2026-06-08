@@ -46,8 +46,10 @@ export class SecurityAuditService {
     };
 
     // No mundo real, enviamos para o Cloud Logging ou uma tabela de auditoria protegida
-    this.logger.log(`SECURE_AUDIT: [${signedLog.action}] by ${signedLog.userId} - Hash: ${signedLog.hash}`);
-    
+    this.logger.log(
+      `SECURE_AUDIT: [${signedLog.action}] by ${signedLog.userId} - Hash: ${signedLog.hash}`,
+    );
+
     return signedLog;
   }
 }

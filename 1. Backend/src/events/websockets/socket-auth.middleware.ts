@@ -26,15 +26,17 @@ import * as admin from 'firebase-admin';
 export const SocketAuthMiddleware = () => {
   return async (socket: Socket, next: (err?: Error) => void) => {
     try {
-      const token = socket.handshake.auth.token || socket.handshake.headers['authorization'];
-      
+      const token =
+        socket.handshake.auth.token ||
+        socket.handshake.headers['authorization'];
+
       if (!token) {
         return next(new Error('Authentication error: No token provided'));
       }
 
       const idToken = token.startsWith('Bearer ') ? token.split(' ')[1] : token;
       const decodedToken = await admin.auth().verifyIdToken(idToken);
-      
+
       socket.data.user = decodedToken;
       next();
     } catch (error) {

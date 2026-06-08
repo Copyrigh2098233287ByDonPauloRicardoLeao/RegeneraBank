@@ -26,7 +26,8 @@ import * as crypto from 'crypto';
 @Injectable()
 export class AuditSigner {
   private lastHash: string = '0'.repeat(64);
-  private readonly secret = process.env.AUDIT_SIGN_SECRET || 'regenera-ultra-secret';
+  private readonly secret =
+    process.env.AUDIT_SIGN_SECRET || 'regenera-ultra-secret';
 
   sign(payload: any): string {
     const data = JSON.stringify(payload) + this.lastHash;
@@ -34,7 +35,7 @@ export class AuditSigner {
       .createHmac('sha256', this.secret)
       .update(data)
       .digest('hex');
-    
+
     this.lastHash = currentHash;
     return currentHash;
   }
@@ -48,7 +49,7 @@ export class AuditSigner {
         .createHmac('sha256', this.secret)
         .update(data)
         .digest('hex');
-      
+
       if (calculatedHash !== hash) return false;
       expectedPrevHash = hash;
     }
