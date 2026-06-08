@@ -225,7 +225,7 @@ export const ProfilePage: React.FC = () => {
         />
       </div>
 
-      {/* Perfil AI prefs real: salvar no backend, usar no Neural (prompt/TTS) */}
+      {/* Perfil AI prefs real: salvar no backend, usar no Neural (context/TTS) */}
       <div className="mx-5 mb-6 bg-[#0d1526] border border-white/5 rounded-2xl p-5">
         <p className="text-[9px] text-cyan-400 uppercase font-black tracking-widest mb-3">Personalização AI (salva real)</p>
         <div className="space-y-3 text-sm">

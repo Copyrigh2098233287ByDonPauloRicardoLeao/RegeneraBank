@@ -152,7 +152,8 @@ export class PixService {
     if (idempotencyKey) {
       const cached = await this.idempotencyGuard.get(idempotencyKey);
       if (cached) {
-        return cached.body || cached;
+        const data = cached.body || cached.payload || cached;
+        return { ...data, isCached: true };
       }
       await this.idempotencyGuard.acquireLock(idempotencyKey, senderNeuralId);
     }

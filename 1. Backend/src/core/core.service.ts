@@ -118,7 +118,11 @@ export class CoreService implements OnModuleInit {
   ): Promise<T> {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction('READ COMMITTED'); // Nível de isolamento bancário seguro para locks de linha
+    const isolation =
+      this.dataSource.options.type === 'sqlite'
+        ? 'SERIALIZABLE'
+        : 'READ COMMITTED';
+    await queryRunner.startTransaction(isolation); // Nível de isolamento bancário seguro para locks de linha
 
     try {
       const repo = queryRunner.manager.getRepository(AccountEntity);
@@ -159,6 +163,20 @@ export class CoreService implements OnModuleInit {
     } finally {
       await queryRunner.release();
     }
+  }
+
+  async createAccount(neuralId: string): Promise<AccountEntity> {
+    const existing = await this.accountRepo.findOne({ where: { neuralId } });
+    if (existing) return existing;
+    const randomAcc = 'RG-' + Math.floor(10000000 + Math.random() * 90000000);
+    const account = this.accountRepo.create({
+      neuralId,
+      balanceCents: 0,
+      accountNumber: randomAcc,
+      agency: '0001',
+      status: 'ACTIVE',
+    });
+    return this.accountRepo.save(account);
   }
 
   async getDashboard(neuralId: string) {
@@ -399,7 +417,11 @@ export class CoreService implements OnModuleInit {
   async transfer(senderId: string, receiverId: string, amountCents: number) {
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
-    await queryRunner.startTransaction('READ COMMITTED');
+    const isolation =
+      this.dataSource.options.type === 'sqlite'
+        ? 'SERIALIZABLE'
+        : 'READ COMMITTED';
+    await queryRunner.startTransaction(isolation);
 
     try {
       const accountRepo = queryRunner.manager.getRepository(AccountEntity);
@@ -407,16 +429,20 @@ export class CoreService implements OnModuleInit {
       // Lock Ordenado para evitar Deadlocks (ordena IDs lexicalmente)
       const lockOrder = [senderId, receiverId].sort();
 
-      const accountA = await accountRepo
+      let qbA = accountRepo
         .createQueryBuilder('a')
-        .where('a.neuralId = :id', { id: lockOrder[0] })
-        .setLock('pessimistic_write')
-        .getOne();
-      const accountB = await accountRepo
-        .createQueryBuilder('a')
-        .where('a.neuralId = :id', { id: lockOrder[1] })
-        .setLock('pessimistic_write')
-        .getOne();
+        .where('a.neuralId = :id', { id: lockOrder[0] });
+      let qbB = accountRepo
+        .createQueryBuilder('b')
+        .where('b.neuralId = :id', { id: lockOrder[1] });
+
+      if (this.dataSource.options.type !== 'sqlite') {
+        qbA = qbA.setLock('pessimistic_write');
+        qbB = qbB.setLock('pessimistic_write');
+      }
+
+      const accountA = await qbA.getOne();
+      const accountB = await qbB.getOne();
 
       if (!accountA || !accountB)
         throw new FinancialSecurityException(

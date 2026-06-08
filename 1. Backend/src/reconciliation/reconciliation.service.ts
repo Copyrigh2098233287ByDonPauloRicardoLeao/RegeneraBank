@@ -24,14 +24,18 @@ export class ReconciliationService {
     const accounts = await this.accountRepo.find();
 
     for (const account of accounts) {
-      const ledgerEntries = await this.ledgerRepo.find({ where: { neuralId: account.neuralId } as any });
-      
+      const ledgerEntries = await this.ledgerRepo.find({
+        where: { accountId: account.id },
+      });
+
       const ledgerSum = ledgerEntries.reduce((acc, entry) => {
         return acc + Number(entry.amountCents);
       }, 0);
 
       if (Number(account.balanceCents) !== ledgerSum) {
-        this.logger.error(`[ALERTA VIGIA] Divergência na conta ${account.neuralId}. Saldo: ${account.balanceCents}, Ledger: ${ledgerSum}`);
+        this.logger.error(
+          `[ALERTA VIGIA] Divergência na conta ${account.neuralId}. Saldo: ${account.balanceCents}, Ledger: ${ledgerSum}`,
+        );
         // Ação: Congelar conta
         account.status = 'FROZEN';
         await this.accountRepo.save(account);
@@ -39,7 +43,7 @@ export class ReconciliationService {
         this.logger.log(`Conta ${account.neuralId} reconciliada com sucesso.`);
       }
     }
-    
+
     this.logger.log('Conciliação finalizada.');
   }
 }

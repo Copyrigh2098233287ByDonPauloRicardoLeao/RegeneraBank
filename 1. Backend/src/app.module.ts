@@ -44,6 +44,7 @@ import { ComplianceModule } from './compliance/compliance.module';
 import { OpenFinanceModule } from './open-finance/open-finance.module';
 import { NeuralCoreModule } from './neural-core/neural-core.module';
 import { InfraModule } from './infra/infra.module';
+import { ReconciliationModule } from './reconciliation/reconciliation.module';
 import { HealthController } from './health.controller';
 
 @Module({
@@ -90,6 +91,7 @@ import { HealthController } from './health.controller';
     OpenFinanceModule,
     NeuralCoreModule,
     InfraModule,
+    ReconciliationModule,
   ],
   controllers: [HealthController],
 })

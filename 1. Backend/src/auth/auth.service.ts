@@ -103,6 +103,7 @@ export class AuthService {
       const accessToken = await this.issueToken(userRecord.uid, email);
 
       // Obtém ou inicializa a conta bancária ACID vinculada a este identity (Neural ID)
+      await this.coreService.createAccount(userRecord.uid);
       const ledgerAccount = await this.resolveLedgerProfile(userRecord.uid);
 
       this.logger.log(

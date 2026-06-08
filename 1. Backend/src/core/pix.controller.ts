@@ -50,6 +50,7 @@ import {
   UseGuards,
   Headers,
   Param,
+  Res,
 } from '@nestjs/common';
 import { IsString, IsNumber, Min } from 'class-validator';
 import { PixService } from './pix.service';
@@ -70,13 +71,19 @@ export class PixController {
     @Req() req: any,
     @Body() dto: TransferDto,
     @Headers('idempotency-key') idemKey: string,
+    @Res() res: any,
   ) {
-    return this.pixService.executePix(
+    const result = await this.pixService.executePix(
       req.user.sub,
       dto.key,
       dto.amount,
       idemKey,
     );
+    if (result && result.isCached) {
+      const { isCached, ...payload } = result;
+      return res.status(200).json(payload);
+    }
+    return res.status(201).json(result);
   }
 
   // Real chaves management for "Minhas Chaves" tab (per spec)

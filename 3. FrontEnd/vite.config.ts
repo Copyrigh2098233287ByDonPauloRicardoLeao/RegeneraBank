@@ -68,6 +68,17 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
+      include: [
+        'src/shared/lib/utils.ts',
+        'src/shared/lib/store.ts',
+        'src/features/pix/ui/PixKeyForm.tsx'
+      ],
+      thresholds: {
+        statements: 70,
+        branches: 65,
+        functions: 70,
+        lines: 70,
+      }
     },
   },
 });

@@ -36,12 +36,21 @@ export class IdempotencyService implements OnModuleDestroy {
   constructor() {
     try {
       if (process.env.NODE_ENV === 'test') {
+        const store = new Map<string, string>();
         this.redis = {
           on: () => {},
           quit: () => {},
-          exists: async () => 0,
-          get: async () => null,
-          set: async () => 'OK',
+          exists: async (k: string) => (store.has(k) ? 1 : 0),
+          get: async (k: string) => store.get(k) || null,
+          set: async (k: string, v: string) => {
+            store.set(k, v);
+            return 'OK';
+          },
+          del: async (k: string) => {
+            const existed = store.has(k);
+            store.delete(k);
+            return existed ? 1 : 0;
+          },
         } as any;
       } else {
         this.redis = new Redis(
