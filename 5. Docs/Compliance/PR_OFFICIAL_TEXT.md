@@ -1,3 +1,7 @@
+**PR Title:** `Release: Core Banking Platform v4.0.0 — Lançamento Oficial do Regenera Bank`
+
+**Description:**
+
 ### Executive Summary: O Nascimento de um Banco
 Este Pull Request não é apenas uma atualização de sistema; ele marca a fundação técnica e o lançamento oficial de toda a infraestrutura do **Regenera Bank Enterprise System**. Foram doze meses ininterruptos de engenharia de software para construir um banco digital do absoluto zero, culminando na consolidação da nossa plataforma sob o paradigma **Feature-Sliced Design (FSD)**.
 
