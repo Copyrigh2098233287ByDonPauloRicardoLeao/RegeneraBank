@@ -26,6 +26,9 @@ import { config } from 'dotenv';
 
 config();
 
+const isProdOrTest =
+  process.env.NODE_ENV === 'production' || process.env.NODE_ENV === 'test';
+
 const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
@@ -33,8 +36,10 @@ const AppDataSource = new DataSource({
     process.env.NODE_ENV === 'test'
       ? false
       : { rejectUnauthorized: process.env.NODE_ENV === 'production' },
-  entities: ['src/**/*.entity.ts', 'dist/**/*.entity.js'],
-  migrations: ['src/migrations/*.ts', 'dist/src/migrations/*.js'],
+  entities: [isProdOrTest ? 'dist/**/*.entity.js' : 'src/**/*.entity.ts'],
+  migrations: [
+    isProdOrTest ? 'dist/src/migrations/*.js' : 'src/migrations/*.ts',
+  ],
   synchronize: false,
   logging: false,
 });
