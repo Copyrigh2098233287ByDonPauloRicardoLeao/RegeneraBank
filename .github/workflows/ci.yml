@@ -17,6 +17,12 @@ jobs:
     name: Production Hardening DevSecOps
     runs-on: ubuntu-latest
 
+    env:
+      JWT_NEURAL_SECRET: "ci-mock-secret-for-tests"
+      PROMETEO_API_KEY: "ci-mock-key"
+      GEMINI_API_KEY: "ci-mock-key"
+      FIREBASE_PROJECT_ID: "ci-mock-project"
+
     services:
       postgres:
         image: postgres:16
