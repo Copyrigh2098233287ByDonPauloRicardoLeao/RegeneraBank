@@ -50,7 +50,7 @@ export class IdempotencyLogEntity {
   createdAt: Date;
 
   @Column({
-    type: process.env.NODE_ENV === 'test' ? 'datetime' : 'timestamptz',
+    type: process.env.NODE_ENV === 'test' ? 'timestamp' : 'timestamptz',
     name: 'expires_at',
   })
   @Index()
