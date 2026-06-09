@@ -50,3 +50,5 @@ pycache/
 # Databases
 *.sqlite
 **/*.sqlite
+coverage/
+3. FrontEnd/coverage/
