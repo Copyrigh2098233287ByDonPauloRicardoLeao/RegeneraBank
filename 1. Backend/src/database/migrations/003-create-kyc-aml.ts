@@ -22,7 +22,8 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateKycAml003 implements MigrationInterface {
+export class CreateKycAml0031700000000003 implements MigrationInterface {
+  name = 'CreateKycAml0031700000000003';
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             CREATE TABLE compliance_audit_trail (

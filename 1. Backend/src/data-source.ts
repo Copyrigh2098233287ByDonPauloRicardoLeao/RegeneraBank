@@ -66,10 +66,10 @@ const entitiesGlobs = isJavascriptRuntime
 
 const migrationsGlobs = isJavascriptRuntime
   ? [
-      normalizeGlob(join(projectRoot, 'dist/migrations/*.js')),
-      normalizeGlob(join(projectRoot, 'dist/src/migrations/*.js')),
+      normalizeGlob(join(projectRoot, 'dist/database/migrations/*.js')),
+      normalizeGlob(join(projectRoot, 'dist/src/database/migrations/*.js')),
     ]
-  : [normalizeGlob(join(projectRoot, 'src/migrations/*.ts'))];
+  : [normalizeGlob(join(projectRoot, 'src/database/migrations/*.ts'))];
 
 const readDatabaseCaCertificate = (): string | undefined => {
   if (process.env.DB_CA_CERT) {

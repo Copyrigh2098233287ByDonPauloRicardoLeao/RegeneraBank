@@ -22,7 +22,8 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateIdempotency002 implements MigrationInterface {
+export class CreateIdempotency0021700000000002 implements MigrationInterface {
+  name = 'CreateIdempotency0021700000000002';
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(`
             CREATE TABLE idempotency_keys (

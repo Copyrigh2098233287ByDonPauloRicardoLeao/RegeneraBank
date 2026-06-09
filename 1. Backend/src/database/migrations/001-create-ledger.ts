@@ -22,7 +22,8 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 
 import { MigrationInterface, QueryRunner, Table, TableIndex } from 'typeorm';
 
-export class CreateLedger1780000000001 implements MigrationInterface {
+export class CreateLedger1700000000001 implements MigrationInterface {
+  name = 'CreateLedger1700000000001';
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({

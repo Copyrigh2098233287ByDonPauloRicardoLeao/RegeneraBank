@@ -29,8 +29,14 @@ import {
 } from 'typeorm';
 import type { ColumnType } from 'typeorm';
 
+const databaseUrl = process.env.DATABASE_URL ?? '';
+
+const isPostgresRuntime =
+  process.env.DB_TYPE === 'postgres' || /^postgres(ql)?:\/\//.test(databaseUrl);
+
 const isSqliteRuntime =
-  process.env.NODE_ENV === 'test' || process.env.DB_TYPE === 'sqlite';
+  process.env.DB_TYPE === 'sqlite' ||
+  (!isPostgresRuntime && process.env.NODE_ENV === 'test');
 
 const timestampColumnType: ColumnType = isSqliteRuntime
   ? 'datetime'
