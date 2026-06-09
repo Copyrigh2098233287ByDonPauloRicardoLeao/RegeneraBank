@@ -23,13 +23,6 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
-import { AccountEntity } from './core/entities/account.entity';
-import { TransactionEntity } from './core/entities/transaction.entity';
-import { UserEntity } from './core/entities/user.entity';
-import { InvestmentEntity } from './investments/entities/investment.entity';
-
-import { PixKeyEntity } from './core/entities/pix-key.entity';
-import { IdempotencyLogEntity } from './core/entities/idempotency-log.entity';
 
 config();
 
@@ -40,14 +33,7 @@ const AppDataSource = new DataSource({
     process.env.NODE_ENV === 'test'
       ? false
       : { rejectUnauthorized: process.env.NODE_ENV === 'production' },
-  entities: [
-    UserEntity,
-    AccountEntity,
-    TransactionEntity,
-    InvestmentEntity,
-    PixKeyEntity,
-    IdempotencyLogEntity,
-  ],
+  entities: ['src/**/*.entity.ts', 'dist/**/*.entity.js'],
   migrations: ['src/migrations/*.ts', 'dist/src/migrations/*.js'],
   synchronize: false,
   logging: false,
