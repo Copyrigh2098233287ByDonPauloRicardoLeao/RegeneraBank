@@ -36,7 +36,7 @@ config();
 const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: process.env.NODE_ENV === 'production' },
+  ssl: process.env.NODE_ENV === 'test' ? false : { rejectUnauthorized: process.env.NODE_ENV === 'production' },
   entities: [
     UserEntity,
     AccountEntity,
