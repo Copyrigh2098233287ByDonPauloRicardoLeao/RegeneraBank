@@ -27,6 +27,14 @@ import {
   CreateDateColumn,
   Index,
 } from 'typeorm';
+import type { ColumnType } from 'typeorm';
+
+const isSqliteRuntime =
+  process.env.NODE_ENV === 'test' || process.env.DB_TYPE === 'sqlite';
+
+const timestampColumnType: ColumnType = isSqliteRuntime
+  ? 'datetime'
+  : 'timestamptz';
 
 @Entity('idempotency_logs')
 export class IdempotencyLogEntity {
@@ -50,8 +58,8 @@ export class IdempotencyLogEntity {
   createdAt: Date;
 
   @Column({
-    type: process.env.NODE_ENV === 'test' ? 'timestamp' : 'timestamptz',
     name: 'expires_at',
+    type: timestampColumnType,
   })
   @Index()
   expiresAt: Date;
