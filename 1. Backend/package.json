@@ -30,8 +30,10 @@
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --max-warnings=0",
     "typecheck": "tsc --noEmit",
     "migration:generate": "typeorm migration:generate -d src/data-source.ts src/migrations",
-    "migration:run": "typeorm migration:run -d src/data-source.ts",
-    "migration:revert": "typeorm migration:revert -d src/data-source.ts"
+    "migration:run": "TYPEORM_RUNTIME=ts typeorm-ts-node-commonjs migration:run -d src/data-source.ts",
+    "migration:revert": "TYPEORM_RUNTIME=ts typeorm-ts-node-commonjs migration:revert -d src/data-source.ts",
+    "migration:run:dist": "TYPEORM_RUNTIME=js typeorm migration:run -d dist/data-source.js",
+    "migration:revert:dist": "TYPEORM_RUNTIME=js typeorm migration:revert -d dist/data-source.js"
   },
   "dependencies": {
     "@google-cloud/bigquery": "^7.5.0",

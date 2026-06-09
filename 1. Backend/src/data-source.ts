@@ -21,15 +21,32 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 */
 
 import 'reflect-metadata';
-import { DataSource } from 'typeorm';
 import { config } from 'dotenv';
+import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
+import type { TlsOptions } from 'tls';
+import { DataSource } from 'typeorm';
 
 config();
 
+type TypeOrmRuntime = 'ts' | 'js';
+
+const resolveTypeOrmRuntime = (): TypeOrmRuntime => {
+  const runtime = (process.env.TYPEORM_RUNTIME ?? 'ts').toLowerCase();
+
+  if (runtime === 'ts' || runtime === 'js') {
+    return runtime;
+  }
+
+  throw new Error(
+    `[RegeneraBank/DataSource] Invalid TYPEORM_RUNTIME="${runtime}". Use "ts" or "js".`,
+  );
+};
+
 const nodeEnv = process.env.NODE_ENV ?? 'development';
 const isProduction = nodeEnv === 'production';
-const isCompiledRuntime = __filename.endsWith('.js');
+const typeOrmRuntime = resolveTypeOrmRuntime();
+const isJavascriptRuntime = typeOrmRuntime === 'js';
 
 const databaseUrl = process.env.DATABASE_URL;
 
@@ -39,58 +56,71 @@ if (!databaseUrl) {
   );
 }
 
-/**
- * TypeORM glob paths must be stable across:
- * - local TS runtime via ts-node
- * - Jest/E2E runtime
- * - compiled JS runtime inside dist/
- */
 const normalizeGlob = (path: string): string => path.replace(/\\/g, '/');
 
-const runtimeExtension = isCompiledRuntime ? 'js' : 'ts';
+const projectRoot = process.env.TYPEORM_ROOT_DIR ?? process.cwd();
 
-/**
- * When running from:
- * - src/data-source.ts  -> __dirname points to src/
- * - dist/data-source.js -> __dirname points to dist/
- */
-const entitiesGlob = normalizeGlob(
-  join(__dirname, `**/*.entity.${runtimeExtension}`),
-);
+const entitiesGlobs = isJavascriptRuntime
+  ? [normalizeGlob(join(projectRoot, 'dist/**/*.entity.js'))]
+  : [normalizeGlob(join(projectRoot, 'src/**/*.entity.ts'))];
 
-const migrationsGlob = normalizeGlob(
-  join(__dirname, `migrations/*.${runtimeExtension}`),
-);
+const migrationsGlobs = isJavascriptRuntime
+  ? [
+      normalizeGlob(join(projectRoot, 'dist/migrations/*.js')),
+      normalizeGlob(join(projectRoot, 'dist/src/migrations/*.js')),
+    ]
+  : [normalizeGlob(join(projectRoot, 'src/migrations/*.ts'))];
 
-/**
- * Banking-grade SSL behavior:
- * - test/local: disabled unless DB_SSL=true
- * - production: enabled with certificate validation
- */
-const shouldUseSsl = isProduction || process.env.DB_SSL === 'true';
+const readDatabaseCaCertificate = (): string | undefined => {
+  if (process.env.DB_CA_CERT) {
+    return process.env.DB_CA_CERT.replace(/\\n/g, '\n');
+  }
 
-if (isProduction && process.env.DB_SSL_REJECT_UNAUTHORIZED === 'false') {
-  throw new Error(
-    '[RegeneraBank/DataSource] DB_SSL_REJECT_UNAUTHORIZED=false is not allowed in production.',
-  );
-}
+  if (process.env.DB_CA_CERT_PATH) {
+    const certificatePath = process.env.DB_CA_CERT_PATH;
 
-const ssl = shouldUseSsl
-  ? {
+    if (!existsSync(certificatePath)) {
+      throw new Error(
+        `[RegeneraBank/DataSource] DB_CA_CERT_PATH does not exist: ${certificatePath}`,
+      );
+    }
+
+    return readFileSync(certificatePath, 'utf8');
+  }
+
+  return undefined;
+};
+
+const buildSslOptions = (): false | TlsOptions => {
+  const shouldUseSsl = isProduction || process.env.DB_SSL === 'true';
+
+  if (!shouldUseSsl) {
+    return false;
+  }
+
+  if (isProduction && process.env.DB_SSL_REJECT_UNAUTHORIZED === 'false') {
+    throw new Error(
+      '[RegeneraBank/DataSource] DB_SSL_REJECT_UNAUTHORIZED=false is not allowed in production.',
+    );
+  }
+
+  const ca = readDatabaseCaCertificate();
+
+  return {
     rejectUnauthorized:
       process.env.DB_SSL_REJECT_UNAUTHORIZED === 'false' && !isProduction
         ? false
         : true,
-    ca: process.env.DB_CA_CERT?.replace(/\\n/g, '\n'),
-  }
-  : false;
+    ...(ca ? { ca } : {}),
+  };
+};
 
 const AppDataSource = new DataSource({
   type: 'postgres',
   url: databaseUrl,
-  ssl,
-  entities: [entitiesGlob],
-  migrations: [migrationsGlob],
+  ssl: buildSslOptions(),
+  entities: entitiesGlobs,
+  migrations: migrationsGlobs,
   synchronize: false,
   logging: process.env.TYPEORM_LOGGING === 'true',
 });
