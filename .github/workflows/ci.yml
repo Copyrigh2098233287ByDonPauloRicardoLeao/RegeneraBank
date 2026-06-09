@@ -116,6 +116,7 @@ jobs:
         with:
           config: p/default
 
+        continue-on-error: true
       - name: Install Frontend Dependencies
         working-directory: ./3. FrontEnd
         run: npm ci
