@@ -22,6 +22,8 @@ jobs:
       PROMETEO_API_KEY: "ci-mock-key"
       GEMINI_API_KEY: "ci-mock-key"
       FIREBASE_PROJECT_ID: "ci-mock-project"
+      FIREBASE_API_KEY: "ci-mock-key"
+      GCP_PROJECT_ID: "ci-mock-project"
 
     services:
       postgres:
