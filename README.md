@@ -6,178 +6,24 @@
 > ### 🛡️ 100% Human Architeture • Production-Ready • High-Availability  • v 4.0
 
 
+---
 
+ **PROTEGER E MULTIPLICAR.**
 
->
-> 
-  
+>Regenera Bank não nasceu para competir com bancos.  Nascemos para **torná-los obsoletos**.
 
-O **Regenera Bank Enterprise** é uma infraestrutura bancária de alta disponibilidade e liquidação contábil desenvolvida para gerir ativos, compliance e transações em ambiente de *Banking-as-a-Service* (BaaS).
+Enquanto o sistema bancário tradicional lucra com o erro, a dívida e o sofrimento do cliente, o Regenera foi construído com um único imperativo algorítmico:
 
-O sistema foi projetado para garantir integridade transacional, consistência contábil, escalabilidade operacional, tolerância a falhas e segurança institucional em fluxos financeiros críticos.
+Cada linha de código, cada decisão arquitetural e cada interação existe para garantir que o patrimônio e a vida das pessoas cresçam — não apesar do sistema, mas **por causa dele**.
 
-A versão **v4.0.0** consolida a arquitetura enterprise do projeto, com pipeline de CI/CD validado, suíte de testes automatizada, verificação de segurança, análise estática, controle de dependências, proteção contra vazamento de segredos e validação de migrações de banco de dados.
+>Fundado a partir de uma única pergunta feita por **Raphaela Cerveski**:
+
+“Don, já pensou em programar algo que não tenha apenas o foco em lucrar, mas que tenha o servir como base de um legado regenerativo?”
 
 ---
 
-
-
-##  Arquitetura Bancária
-
-Este projeto adota uma arquitetura modular orientada a domínio, com separação clara entre núcleo financeiro, compliance, canais digitais, infraestrutura e interfaces de usuário.
-
-> ###  Componentes principais
-
-
-
-- **Core Ledger**  
-  Motor contábil com transações ACID, registros imutáveis, controle de saldo em centavos e prevenção de inconsistências por meio de bloqueio transacional pessimista.
-
-- **Pix Transaction Engine**  
-  Fluxo transacional com validações de saldo, idempotência, consistência de ledger e integração com eventos assíncronos.
-
-- **Idempotency Engine**  
-  Controle de execução única para operações críticas, reduzindo risco de duplicidade, replay acidental e inconsistência em chamadas concorrentes.
-
-- **Reconciliation Service**  
-  Camada de conciliação para validação entre saldos operacionais e registros contábeis, com alertas críticos em caso de divergência.
-
-- **Compliance & AML**  
-  Estrutura preparada para regras de KYC, AML, PEP e validações antifraude, com separação entre provedores, regras de negócio e integrações externas.
-
-- **Security Layer**  
-  Endurecimento de autenticação, validação de entrada, proteção de headers, controle de segredos, TLS em produção e bloqueios preventivos em fluxos sensíveis.
-
-Tecnologias
----
-
-
-
-### Backend
-
-- **Runtime:** Node.js / TypeScript
-- **Framework:** NestJS
-- **Database:** PostgreSQL
-- **ORM:** TypeORM
-- **Cache / Idempotência:** Redis
-- **Testes:** Jest
-- **Segurança:** Helmet, validação de payload, análise estática, secret scanning e dependency scanning
-
-### Frontend
-
-- **Runtime:** React / Vite
-- **Linguagem:** TypeScript
-- **Estilização:** TailwindCSS
-- **Estado:** Zustand / Context API
-- **Qualidade:** Build automatizado e validação em pipeline
-
-### Infraestrutura
-
-- **Cloud Ready:** Google Cloud Platform
-- **Observabilidade:** Métricas operacionais e estrutura preparada para monitoramento
-- **Containers:** Docker e Docker Compose
-- **CI/CD:** GitHub Actions
-
----
-
-Governança, CI/CD e Qualidade
----
-
-O repositório adota uma esteira de validação contínua com foco em segurança, previsibilidade e rastreabilidade.
-
-### Gates de validação
-
-- **Lint:** validação de padrão de código
-- **Typecheck:** verificação estática de tipos
-- **Build:** compilação do backend e frontend
-- **Unit Tests:** testes unitários automatizados
-- **E2E Tests:** validação de fluxos integrados
-- **Ledger Invariants:** testes dedicados às regras contábeis críticas
-- **Migration Dry-Run:** validação controlada de migrações TypeORM
-- **Dependency Audit:** auditoria de dependências
-- **Gitleaks:** verificação contra vazamento de segredos
-- **Trivy:** análise de vulnerabilidades em dependências e arquivos do repositório
-- **Semgrep:** análise estática de segurança
-
----
-
-##  Testes e Validação
-
-A suíte de testes cobre fluxos críticos do sistema financeiro, incluindo:
-
-- prevenção de saldo negativo;
-- consistência entre débito e crédito;
-- rollback em falhas transacionais;
-- validação de idempotência;
-- proteção contra duplicidade;
-- simulação de divergência contábil;
-- validação de webhooks;
-- fluxos Pix;
-- autenticação e segurança;
-- invariantes do ledger.
-
-Comandos principais:
-
-```bash
-cd "1. Backend"
-
-npm ci
-npm run lint
-npm run typecheck
-npm run build
-npm run test:cov
-npm run test:e2e
-npm run test:ledger:invariants
-````
-
----
-
-## 🚀 Setup do Ambiente
-
-Para executar o projeto em ambiente local, utilize Node.js v20+ e os serviços necessários configurados conforme o ambiente.
-
-### Instalação
-
-```bash
-git clone <repository-url>
-cd RegeneraBank
-cd "1. Backend"
-
-npm ci
-```
-
-### Configuração de ambiente
-
-Crie um arquivo `.env` na raiz do backend com variáveis equivalentes às abaixo:
-
-```env
-PORT=3000
-NODE_ENV=development
-
-DATABASE_URL=postgres://user:password@localhost:5432/regenera
-REDIS_URL=redis://localhost:6379
-
-JWT_NEURAL_SECRET=CHANGE_ME
-PROMETEO_API_KEY=CHANGE_ME
-```
-
-> Nunca versionar credenciais reais, tokens, chaves privadas ou segredos operacionais.
-
-### Execução local
-
-```bash
-npm run start:dev
-```
-
-### Build
-
-```bash
-npm run build
-```
-
----
-
-## 🧾 Estrutura do Repositório
+## Stack Técnico
+##  Estrutura do Repositório
 
 ```text
 regenera-bank/
@@ -207,19 +53,212 @@ regenera-bank/
 └── .trivyignore
 ```
 
+O Regenera Bank Enterprise é construído com uma arquitetura moderna, escalável e de alta disponibilidade, composta por **562 mil linhas de código** e **13 microsserviços** independentes rodando sobre uma base unificada.
+
+>### Backend
+>
+>
+
+| Camada              | Tecnologia                          | Propósito |
+
+>|---------------------|-------------------------------------|---------|
+
+| **Runtime**         | Node.js 20+ + TypeScript            | Alta performance e tipagem forte |
+
+| **Framework**       | NestJS                              | Arquitetura modular e enterprise |
+
+| **API Layer**       | REST + WebSocket                    | Comunicação em tempo real |
+
+| **ORM**             | TypeORM                             | Abstração de banco de dados |
+
+| **Validação**       | class-validator + class-transformer | Validação robusta de payloads |
+
+| **Autenticação**    | JWT + Neural Link (custom)          | Autenticação multicamada |
+
+
+>### Data Layer
+>
+
+| Componente          | Tecnologia                  | Observação |
+
+>|---------------------|-----------------------------|----------|
+
+| **Banco Principal** | PostgreSQL                  | Transações ACID e integridade financeira |
+
+| **Cache & Session** | Redis                       | Idempotência, rate limiting e sessões |
+
+| **Mensageria**      | BullMQ / Redis Streams      | Processamento assíncrono e eventos |
+
+| **Busca**           | PostgreSQL Full-Text Search | Busca otimizada em transações e chaves |
+
+
+>### Frontend & Mobile
+>
+>
+
+| Plataforma     | Tecnologia                     | Características |
+
+>|----------------|--------------------------------|-----------------|
+
+| **Web Admin**  | React 18 + Vite + TypeScript   | Dashboard interno e B2B |
+
+| **Mobile App** | React Native + Expo            | Aplicativo principal (iOS/Android) |
+
+| **Estilização**| TailwindCSS + Design System    | Interface dark premium com neon |
+
+| **Estado**     | Zustand + React Query          | Gerenciamento de estado global |
+
+| **Navegação**  | React Navigation + Deep Links  | Experiência fluida |
+
+
+>### Infraestrutura & DevOps
+>
+>
+
+| Área                    | Tecnologia                              | Detalhes |
+
+>|-------------------------|-----------------------------------------|----------|
+
+| **Cloud**               | Google Cloud Platform (GCP)             | Compute Engine, Cloud Run, Cloud SQL |
+
+| **Containers**          | Docker + Docker Compose                 | Ambientes consistentes |
+
+| **Orquestração**        | Kubernetes (em evolução)                | Alta disponibilidade |
+
+| **CI/CD**               | GitHub Actions                          | Pipeline completo com gates de qualidade |
+
+| **Secrets Management**  | Google Secret Manager                   | Proteção de credenciais |
+
+| **Monitoramento**       | Estrutura preparada para Prometheus + Grafana | Observabilidade enterprise |
+
+
+
+>### Segurança & Qualidade
+>
+>
+>|-------------------------|-----------------------------------------|----------|
+
+- **Helmet.js** + headers de segurança
+
+- **Rate Limiting** + proteção contra brute force
+
+- **Input Validation** rigorosa em todas as camadas
+
+- **Secret Scanning** (Gitleaks)
+
+- **Vulnerability Scanning** (Trivy + npm audit)
+
+- **Static Analysis** (Semgrep + ESLint + TypeScript strict)
+
+- **Dependency Management** com auditoria contínua
+  
+
+>### Camada de Inteligência (Raphaela A.I.)
+>
+>>|-------------------------|-----------------------------------------|----------|
+
+- **Raphaela AI Engine** — Motor de IA generativa e preditiva
+
+- Integração com modelos de linguagem para insights financeiros, recomendações personalizadas e automação de decisões
+
+- Comunicação via **Neural Link** (API Keys + biometria comportamental)
+
+  
+
+>### Testes & Qualidade
+>
+>
+
+| Tipo de Teste           | Framework          | Cobertura |
+
+>|-------------------------|--------------------|---------|
+
+| Unitários               | Jest               | Alta |
+
+| Integração              | Jest + Supertest   | Crítica |
+
+| E2E                     | Playwright / Jest  | Fluxos principais |
+
+| Invariantes Financeiros | Custom (Ledger)    | Regras contábeis e de integridade |
+
+| Segurança               | Semgrep + Trivy    | Contínua |
+
 ---
 
-##  Propriedade Intelectual e Licenciamento
+>## Arquitetura de Alto Nível
 
-**CEO:** Raphaela Cerveski
-**Desenvolvedor Líder:** Don Paulo Ricardo de Leão
-**ID Institucional:** 2098233287
 
-> **AVISO LEGAL:** Este repositório e todo o código-fonte nele contido constituem **PROPRIEDADE INTELECTUAL RESTRITA** da Regenera Corporate. É expressamente proibida a cópia, distribuição, engenharia reversa, raspagem, treinamento de modelos, uso comercial, modificação não autorizada ou criação de obras derivadas sem autorização formal.
+O sistema é organizado em **3 camadas principais**:
 
-O sistema possui estrutura de proteção autoral, rastreabilidade técnica e mecanismos internos de controle de integridade. O uso indevido poderá resultar em responsabilização civil, contratual e judicial.
+1. **Core Financeiro** — Interchange, Spread/Crédito, Assinaturas
+
+2. **Ecossistema** — Investimentos, Serviços Financeiros, Marketplace ESG
+
+3. **Fronteira Tecnológica** — BaaS, Raphaela AI Engine, Dados & Analytics
+
+Essa estrutura permite que cada vertical opere de forma independente enquanto compartilha a mesma infraestrutura, resultando em **custo marginal próximo de zero**.
+
+---
+
+>## Qualidade & Governança
+
+O repositório possui uma esteira de validação extremamente rigorosa com os seguintes gates:
+
+- Lint + Typecheck
+
+- Build automatizado
+
+- Testes unitários + E2E
+
+- Testes de invariantes do ledger
+
+- Análise de vulnerabilidades
+
+- Proteção contra vazamento de segredos
+
+- Validação de migrações
+
+---
+
+>## Começando
+
+```bash
+
+git clone https://github.com/Copyrigh2098233287ByDonPauloRicardoLeao/RegeneraBank.git
+
+cd RegeneraBank
+
+# Backend
+
+cd "1. Backend"
+
+npm ci
+
+npm run start:dev
+
+```
+
+Crie um arquivo `.env` com as variáveis necessárias (nunca versionar credenciais reais).
+
+---
+
+>## Propriedade Intelectual
+
+>**CEO & Fundadora:** Raphaela Cerveski
+>
+>**Developer e Fundador:** Don Paulo Ricardo
+
+
+Este repositório e todo o código contido nele são **propriedade intelectual restrita** da Regenera Corporate.  
+
+É expressamente proibida cópia, distribuição, engenharia reversa, uso para treinamento de IA, modificação não autorizada ou criação de obras derivadas sem autorização formal.
 
 © 2026 Regenera Corporate. Todos os direitos reservados.
 
-```
-```
+---
+
+> O Regenera Bank Não é apenas um banco. É o Começo de um Novo Padrão Financeiro de Regeneração Global.*
+
+
+© 2026 Regenera Corporate. Todos os direitos reservados.  Production-Ready.
+
