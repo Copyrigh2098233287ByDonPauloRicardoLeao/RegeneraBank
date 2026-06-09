@@ -16,7 +16,7 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
                engenharia reversa ou modificação não autorizada.
 
 |---------------------------------------------------------------------------------------|
-|  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW          |
+|  --> CLASSIFICATION: PROPRIETARY // DEVELOPER MAINTAINED // REQUIRES SENIOR REVIEW    |
 |---------------------------------------------------------------------------------------|
 */
 
@@ -36,7 +36,10 @@ config();
 const AppDataSource = new DataSource({
   type: 'postgres',
   url: process.env.DATABASE_URL,
-  ssl: process.env.NODE_ENV === 'test' ? false : { rejectUnauthorized: process.env.NODE_ENV === 'production' },
+  ssl:
+    process.env.NODE_ENV === 'test'
+      ? false
+      : { rejectUnauthorized: process.env.NODE_ENV === 'production' },
   entities: [
     UserEntity,
     AccountEntity,
