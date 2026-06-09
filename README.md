@@ -1,6 +1,6 @@
 
 # Regenera Bank • Enterprise Core Banking   
-[![Regenera Enterprise CI/CD Pipeline](https://github.com/Copyrigh2098233287ByDonPauloRicardoLeao/RegeneraBank/actions/workflows/ci.yml/badge.svg)](https://github.com/Copyrigh2098233287ByDonPauloRicardoLeao/RegeneraBank/actions) ![High-Availabilit](https://img.shields.io/badge/Production_Ready-_Copyright-00AEEF?style=for-the-badge&labelColor=0A1024) ![High-Availabilit](https://img.shields.io/badge/Certificate_FREE_AI%E2%8A%98_-ff3366?style=for-the-badge&labelColor=0A1024)
+[![Regenera Enterprise CI/CD Pipeline](https://github.com/Copyrigh2098233287ByDonPauloRicardoLeao/RegeneraBank/actions/workflows/ci.yml/badge.svg)](https://github.com/Copyrigh2098233287ByDonPauloRicardoLeao/RegeneraBank/actions) ![High-Availabilit](https://img.shields.io/badge/Production_Ready-_Copyright_©-00AEEF?style=for-the-badge&labelColor=0A1024) ![High-Availabilit](https://img.shields.io/badge/Certificate_FREE_AI%E2%8A%98_-ff3366?style=for-the-badge&labelColor=0A1024)
 ---
 
 > ### 🛡️ Certificate 100% Human Architeture  • GitHub Nativo • High-Availability  • v 4.0
@@ -242,23 +242,22 @@ Crie um arquivo `.env` com as variáveis necessárias (nunca versionar credencia
 
 ---
 
->## Propriedade Intelectual
+>## Propriedade Intelectual ©
 
 >**CEO & Fundadora:** Raphaela Cerveski
 >
 >**Developer e Fundador:** Don Paulo Ricardo
 
 
+
+> O Regenera Bank Não é apenas um banco. É o Começo de um Novo Padrão Financeiro de Regeneração Global.*
+
+---
+
 Este repositório e todo o código contido nele são **propriedade intelectual restrita** da Regenera Corporate.  
 
 É expressamente proibida cópia, distribuição, engenharia reversa, uso para treinamento de IA, modificação não autorizada ou criação de obras derivadas sem autorização formal.
 
-© 2026 Regenera Corporate. Todos os direitos reservados.
-
 ---
 
-> O Regenera Bank Não é apenas um banco. É o Começo de um Novo Padrão Financeiro de Regeneração Global.*
-
-
-© 2026 Regenera Corporate. Todos os direitos reservados.  Production-Ready.
-
+>© 2026 Regenera Corporate. Todos os direitos reservados.  Production-Ready.
