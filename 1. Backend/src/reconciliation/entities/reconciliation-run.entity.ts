@@ -19,7 +19,7 @@ export class ReconciliationRunEntity {
   @Column({ type: 'int', default: 0 })
   divergencesCount: number;
 
-  @Column({ type: 'jsonb', nullable: true })
+  @Column({ type: 'simple-json', nullable: true })
   divergencesDetails: any;
 
   @Column({ type: 'int' })
