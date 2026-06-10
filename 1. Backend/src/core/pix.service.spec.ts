@@ -7,6 +7,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { AccountEntity } from './entities/account.entity';
 import { BadRequestException, HttpException } from '@nestjs/common';
 import { MetricsService } from '../metrics/metrics.service';
+import { TracingService } from '../infra/tracing/tracing.service';
 
 jest.mock('@google-cloud/pubsub', () => ({
   PubSub: jest.fn().mockImplementation(() => ({
@@ -72,6 +73,7 @@ describe('PixService (Unit Tests)', () => {
         { provide: IdempotencyService, useValue: mockIdempotency },
         { provide: getRepositoryToken(AccountEntity), useValue: {} },
         { provide: MetricsService, useValue: mockMetricsService },
+        { provide: TracingService, useValue: { startSpan: jest.fn(), endSpan: jest.fn() } },
       ],
     }).compile();
 

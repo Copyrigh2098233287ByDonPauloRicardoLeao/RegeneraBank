@@ -30,6 +30,7 @@ import { getRepositoryToken } from '@nestjs/typeorm';
 import { ConflictException } from '@nestjs/common';
 import { AccountEntity } from '../src/core/entities/account.entity';
 import { MetricsService } from '../src/metrics/metrics.service';
+import { TracingService } from '../src/infra/tracing/tracing.service';
 
 describe('Pix Concurrency & Idempotency Test', () => {
   let pixService: PixService;
@@ -95,6 +96,7 @@ describe('Pix Concurrency & Idempotency Test', () => {
           provide: getRepositoryToken(AccountEntity),
           useValue: {},
         },
+        { provide: TracingService, useValue: { startSpan: jest.fn(), endSpan: jest.fn() } },
         PixService,
       ],
     }).compile();
