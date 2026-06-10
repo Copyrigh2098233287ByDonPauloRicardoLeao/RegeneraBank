@@ -147,7 +147,11 @@ export class PixService {
     amount: number,
     idempotencyKey?: string,
   ) {
-    this.tracingService.startSpan('executePix', { senderNeuralId, receiverKey, amount });
+    this.tracingService.startSpan('executePix', {
+      senderNeuralId,
+      receiverKey,
+      amount,
+    });
     try {
       this.metricsService.incrementPixRequests();
       if (amount <= 0) {

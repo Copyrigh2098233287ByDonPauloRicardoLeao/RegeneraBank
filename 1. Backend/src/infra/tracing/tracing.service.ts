@@ -19,16 +19,23 @@ export class TracingService {
     const spanId = randomUUID();
     const startTime = Date.now();
 
-    const spanContext: SpanContext = { traceId, spanId, operation: name, startTime };
-    this.als.enterWith(spanContext);
-
-    this.logger.log(JSON.stringify({
-      event: 'span_start',
+    const spanContext: SpanContext = {
       traceId,
       spanId,
       operation: name,
-      attributes,
-    }));
+      startTime,
+    };
+    this.als.enterWith(spanContext);
+
+    this.logger.log(
+      JSON.stringify({
+        event: 'span_start',
+        traceId,
+        spanId,
+        operation: name,
+        attributes,
+      }),
+    );
   }
 
   endSpan() {
@@ -36,13 +43,15 @@ export class TracingService {
     if (!context) return;
 
     const durationMs = Date.now() - context.startTime;
-    this.logger.log(JSON.stringify({
-      event: 'span_end',
-      traceId: context.traceId,
-      spanId: context.spanId,
-      operation: context.operation,
-      durationMs,
-    }));
+    this.logger.log(
+      JSON.stringify({
+        event: 'span_end',
+        traceId: context.traceId,
+        spanId: context.spanId,
+        operation: context.operation,
+        durationMs,
+      }),
+    );
   }
 
   getCurrentTraceId(): string | undefined {

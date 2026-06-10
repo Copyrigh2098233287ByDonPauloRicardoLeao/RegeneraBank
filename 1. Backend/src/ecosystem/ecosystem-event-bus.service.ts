@@ -14,14 +14,18 @@ export class EcosystemEventBusService {
   ) {}
 
   async publish<T>(topic: string, event: DomainEvent<T>): Promise<void> {
-    this.logger.log(`Publishing ecosystem event [${topic}] from source [${event.source}]`);
-    
+    this.logger.log(
+      `Publishing ecosystem event [${topic}] from source [${event.source}]`,
+    );
+
     const outboxEntry = this.outboxRepo.create({
       topic,
       payload: event as any,
     });
-    
+
     await this.outboxRepo.save(outboxEntry);
-    this.logger.log(`Event [${event.eventId}] published to outbox successfully.`);
+    this.logger.log(
+      `Event [${event.eventId}] published to outbox successfully.`,
+    );
   }
 }

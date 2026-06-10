@@ -15,12 +15,26 @@ export class DeveloperPortalService {
     private readonly subscriptionRepo: Repository<ApiSubscriptionEntity>,
   ) {}
 
-  async createProduct(name: string, scopes: string[], rateLimit = 100, allowedIps?: string[]) {
-    const product = this.productRepo.create({ name, scopes, rateLimit, allowedIps });
+  async createProduct(
+    name: string,
+    scopes: string[],
+    rateLimit = 100,
+    allowedIps?: string[],
+  ) {
+    const product = this.productRepo.create({
+      name,
+      scopes,
+      rateLimit,
+      allowedIps,
+    });
     return this.productRepo.save(product);
   }
 
-  async generateApiKey(partnerId: string, productId: string, createdBy?: string) {
+  async generateApiKey(
+    partnerId: string,
+    productId: string,
+    createdBy?: string,
+  ) {
     const rawSecret = randomBytes(24).toString('hex');
     const apiKeyHash = await argon2.hash(rawSecret);
 
@@ -41,15 +55,15 @@ export class DeveloperPortalService {
     if (parts.length !== 4 || parts[0] !== 'rg' || parts[1] !== 'live') {
       throw new UnauthorizedException('Invalid API Key format');
     }
-    
+
     const subscriptionId = parts[2];
     const rawSecret = parts[3];
 
-    const sub = await this.subscriptionRepo.findOne({ 
-      where: { id: subscriptionId }, 
-      relations: ['product'] 
+    const sub = await this.subscriptionRepo.findOne({
+      where: { id: subscriptionId },
+      relations: ['product'],
     });
-    
+
     if (!sub || sub.revokedAt || !sub.product.active) {
       throw new UnauthorizedException('API Key invalid or revoked');
     }
@@ -66,7 +80,9 @@ export class DeveloperPortalService {
   }
 
   async revokeKey(subscriptionId: string) {
-    const sub = await this.subscriptionRepo.findOne({ where: { id: subscriptionId } });
+    const sub = await this.subscriptionRepo.findOne({
+      where: { id: subscriptionId },
+    });
     if (sub) {
       sub.revokedAt = new Date();
       await this.subscriptionRepo.save(sub);

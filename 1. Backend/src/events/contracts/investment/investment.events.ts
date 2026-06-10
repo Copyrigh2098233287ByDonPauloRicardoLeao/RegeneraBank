@@ -8,4 +8,5 @@ export interface InvestmentOrderExecutedPayload {
   totalValue: number;
 }
 
-export type InvestmentOrderExecutedEvent = DomainEvent<InvestmentOrderExecutedPayload>;
+export type InvestmentOrderExecutedEvent =
+  DomainEvent<InvestmentOrderExecutedPayload>;

@@ -102,12 +102,15 @@ export class ReconciliationService {
     try {
       // Mock logic: check if investments match ledger
       const investments = await queryRunner.manager.find(InvestmentEntity);
-      
+
       for (const inv of investments) {
         // Just an example check
         if (!inv.neural_id) {
           divergencesCount++;
-          divergencesDetails.push({ investmentId: inv.id, reason: 'Missing neural_id' });
+          divergencesDetails.push({
+            investmentId: inv.id,
+            reason: 'Missing neural_id',
+          });
         }
       }
 
@@ -129,7 +132,9 @@ export class ReconciliationService {
     });
 
     if (divergencesCount > 0) {
-      this.logger.error(`[CRITICAL] Divergence found in investments. Count: ${divergencesCount}`);
+      this.logger.error(
+        `[CRITICAL] Divergence found in investments. Count: ${divergencesCount}`,
+      );
       // Send metric alert
     }
   }
@@ -145,12 +150,19 @@ export class ReconciliationService {
     await queryRunner.startTransaction();
 
     try {
-      const pendingEvents = await queryRunner.manager.find(OutboxEventEntity, { where: { status: 'PENDING' } });
-      const staleEvents = pendingEvents.filter(e => (Date.now() - new Date(e.createdAt).getTime()) > 3600000); // older than 1h
+      const pendingEvents = await queryRunner.manager.find(OutboxEventEntity, {
+        where: { status: 'PENDING' },
+      });
+      const staleEvents = pendingEvents.filter(
+        (e) => Date.now() - new Date(e.createdAt).getTime() > 3600000,
+      ); // older than 1h
 
       if (staleEvents.length > 0) {
         divergencesCount = staleEvents.length;
-        divergencesDetails.push({ reason: 'Stale events found', count: staleEvents.length });
+        divergencesDetails.push({
+          reason: 'Stale events found',
+          count: staleEvents.length,
+        });
       }
 
       await queryRunner.commitTransaction();
@@ -171,7 +183,9 @@ export class ReconciliationService {
     });
 
     if (divergencesCount > 0) {
-      this.logger.error(`[CRITICAL] Divergence found in events processing. Count: ${divergencesCount}`);
+      this.logger.error(
+        `[CRITICAL] Divergence found in events processing. Count: ${divergencesCount}`,
+      );
       // Send metric alert
     }
   }

@@ -77,7 +77,7 @@ export class NeuralAuthGuard implements CanActivate {
         email: decodedToken.email,
         role: decodedToken.role || 'user',
       };
-      
+
       this.injectTenantContext(decodedToken, request);
       return true;
     } catch (firebaseError: any) {
@@ -96,9 +96,14 @@ export class NeuralAuthGuard implements CanActivate {
   }
 
   private injectTenantContext(decodedToken: any, request: any) {
-    const tenantId = decodedToken.tenantId || request.headers['x-tenant-id'] || 'default-tenant';
-    const organizationId = decodedToken.organizationId || request.headers['x-organization-id'];
-    const environment = decodedToken.environment || process.env.NODE_ENV || 'development';
+    const tenantId =
+      decodedToken.tenantId ||
+      request.headers['x-tenant-id'] ||
+      'default-tenant';
+    const organizationId =
+      decodedToken.organizationId || request.headers['x-organization-id'];
+    const environment =
+      decodedToken.environment || process.env.NODE_ENV || 'development';
 
     tenantContext.enterWith({
       tenantId,
