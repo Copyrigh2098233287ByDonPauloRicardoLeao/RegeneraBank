@@ -54,7 +54,7 @@ Para rodar este projeto em ambiente corporativo seguro, certifique-se de possuir
 ```bash
 git clone <url-do-repositorio>
 cd RegeneraBank
-cd "1. Backend"
+cd "01-banking-core-engine"
 
 # O repositório exige lockfile estrito para evitar corrupção de subdependências
 npm ci

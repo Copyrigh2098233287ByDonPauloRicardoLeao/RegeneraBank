@@ -52,39 +52,39 @@ jobs:
           node-version: "20"
           cache: npm
           cache-dependency-path: |
-            1. Backend/package-lock.json
-            3. FrontEnd/package-lock.json
+            01-banking-core-engine/package-lock.json
+            03-enterprise-web-platform/package-lock.json
 
       - name: Install Backend Dependencies
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         run: npm ci
 
       - name: Backend Lint
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         run: npm run lint
 
       - name: Backend Typecheck
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         run: npm run typecheck
 
       - name: Backend Unit Tests & Coverage
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         run: npm run test:cov
 
       - name: Backend E2E Tests
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         run: npm run test:e2e
 
       - name: Backend Ledger Invariants Tests
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         run: npm run test:ledger:invariants
 
       - name: Backend Build
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         run: npm run build
 
       - name: Backend Migration Dry-Run
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         env:
           NODE_ENV: test
           DATABASE_URL: postgres://postgres:postgres@localhost:5432/regenera_test
@@ -93,7 +93,7 @@ jobs:
           npm run migration:revert
 
       - name: Dependency Security Audit
-        working-directory: ./1. Backend
+        working-directory: ./01-banking-core-engine
         run: npm audit --audit-level=critical
 
       - name: Gitleaks Secret Scanner
@@ -118,17 +118,17 @@ jobs:
 
         continue-on-error: true
       - name: Install Frontend Dependencies
-        working-directory: ./3. FrontEnd
+        working-directory: ./03-enterprise-web-platform
         run: npm ci
 
       - name: Frontend Lint
-        working-directory: ./3. FrontEnd
+        working-directory: ./03-enterprise-web-platform
         run: npm run lint
 
       - name: Frontend Tests & Coverage
-        working-directory: ./3. FrontEnd
+        working-directory: ./03-enterprise-web-platform
         run: npm run test:cov
 
       - name: Frontend Build
-        working-directory: ./3. FrontEnd
+        working-directory: ./03-enterprise-web-platform
         run: npm run build

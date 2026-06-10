@@ -52,3 +52,7 @@ pycache/
 **/*.sqlite
 coverage/
 3. FrontEnd/coverage/
+
+# Large release packages and presentations
+*.zip
+*.pdf

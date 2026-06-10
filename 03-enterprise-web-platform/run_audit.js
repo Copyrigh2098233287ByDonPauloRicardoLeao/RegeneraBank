@@ -274,7 +274,7 @@ import fs from 'fs';
 
   // --- SAVE AUDIT RESULTS ---
   console.log("\nSaving results to audit_results.json...");
-  fs.writeFileSync('/Users/regeneracorporateltdacopyright/Documents/ok deploy/regenera ultimo/ORGANIZAÇÃO/3. FrontEnd/audit_results.json', JSON.stringify(auditLog, null, 2));
+  fs.writeFileSync('/Users/regeneracorporateltdacopyright/Documents/ok deploy/regenera ultimo/ORGANIZAÇÃO/03-enterprise-web-platform/audit_results.json', JSON.stringify(auditLog, null, 2));
   console.log("Results saved successfully!");
 
   await browser.close();

@@ -31,10 +31,10 @@
 #
 # To run: gcloud builds submit --config=infra/cloudbuild.yaml .   (from project root)
 steps:
-  # 1. Backend: Install Dependencies & Run Unit Tests
+  # 01-banking-core-engine: Install Dependencies & Run Unit Tests
   - id: backend-tests
     name: 'node:20'
-    dir: '1. Backend'
+    dir: '01-banking-core-engine'
     entrypoint: 'bash'
     args: 
       - '-c'
@@ -50,7 +50,7 @@ steps:
       - '-t'
       - 'southamerica-east1-docker.pkg.dev/$PROJECT_ID/regenera-repo/core-api:$BUILD_ID'
       - '-f'
-      - '1. Backend/Dockerfile'
+      - '01-banking-core-engine/Dockerfile'
       - '.'
 
   # 3. Security Audit: Scan Container for Vulnerabilities

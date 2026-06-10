@@ -43,7 +43,7 @@ async function run() {
     await client.connect();
     console.log('Connected to Neon');
 
-    const sqlPath = path.resolve(__dirname, '../../4. Infra/sql/V1__init.sql');
+    const sqlPath = path.resolve(__dirname, '../../04-secure-cloud-foundation/sql/V1__init.sql');
     const sql = fs.readFileSync(sqlPath, 'utf8');
 
     await client.query(sql);

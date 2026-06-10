@@ -26,7 +26,7 @@ const path = require('path');
 
 const connectionString = process.env.DATABASE_URL || 'postgresql://neondb_owner:npg_FRhJ2dQY7Sjn@ep-wild-sound-aceu31tt.sa-east-1.aws.neon.tech/neondb?sslmode=require';
 
-const sqlPath = path.resolve(__dirname, '../../4. Infra/sql/V1__init.sql');
+const sqlPath = path.resolve(__dirname, '../../04-secure-cloud-foundation/sql/V1__init.sql');
 const sql = fs.readFileSync(sqlPath, 'utf8');
 
 (async () => {
