@@ -73,7 +73,10 @@ describe('PixService (Unit Tests)', () => {
         { provide: IdempotencyService, useValue: mockIdempotency },
         { provide: getRepositoryToken(AccountEntity), useValue: {} },
         { provide: MetricsService, useValue: mockMetricsService },
-        { provide: TracingService, useValue: { startSpan: jest.fn(), endSpan: jest.fn() } },
+        {
+          provide: TracingService,
+          useValue: { startSpan: jest.fn(), endSpan: jest.fn() },
+        },
       ],
     }).compile();
 

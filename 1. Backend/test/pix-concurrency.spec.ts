@@ -97,7 +97,10 @@ describe('Pix Concurrency & Idempotency Test', () => {
           provide: getRepositoryToken(AccountEntity),
           useValue: {},
         },
-        { provide: TracingService, useValue: { startSpan: jest.fn(), endSpan: jest.fn() } },
+        {
+          provide: TracingService,
+          useValue: { startSpan: jest.fn(), endSpan: jest.fn() },
+        },
         PixService,
       ],
     }).compile();
