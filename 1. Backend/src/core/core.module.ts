@@ -39,9 +39,12 @@ import { PixKeyEntity } from './entities/pix-key.entity';
 import { IdempotencyLogEntity } from './entities/idempotency-log.entity';
 import { OutboxEventEntity } from './entities/outbox-event.entity';
 
+import { InfraModule } from '../infra/infra.module';
+
 @Module({
   imports: [
     forwardRef(() => AuthModule),
+    forwardRef(() => InfraModule),
     TypeOrmModule.forFeature([
       UserEntity,
       AccountEntity,

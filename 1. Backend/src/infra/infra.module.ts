@@ -23,10 +23,13 @@ WARNING:       TODOS OS DIREITOS RESERVADOS. Proibida a cópia, distribuição,
 import { Module } from '@nestjs/common';
 import { InfraController } from './infra.controller';
 import { InfraService } from './infra.service';
+import { TracingService } from './tracing/tracing.service';
+import { BackupService } from './disaster-recovery/backup.service';
+import { RestoreService } from './disaster-recovery/restore.service';
 
 @Module({
   controllers: [InfraController],
-  providers: [InfraService],
-  exports: [InfraService],
+  providers: [InfraService, TracingService, BackupService, RestoreService],
+  exports: [InfraService, TracingService, BackupService, RestoreService],
 })
 export class InfraModule {}

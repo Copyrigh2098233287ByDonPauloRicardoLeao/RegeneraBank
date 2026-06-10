@@ -48,6 +48,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as admin from 'firebase-admin';
+import { tenantContext } from '../common/tenant/tenant.context';
 
 /**
  * Neural Auth Guard - validates the Bearer JWT or Firebase IdToken
@@ -76,11 +77,15 @@ export class NeuralAuthGuard implements CanActivate {
         email: decodedToken.email,
         role: decodedToken.role || 'user',
       };
+      
+      this.injectTenantContext(decodedToken, request);
       return true;
     } catch (firebaseError: any) {
       // Fallback to local JWT (Protocolo Neural) for tests and internal tokens
       try {
-        request.user = await this.jwtService.verifyAsync(token);
+        const decodedToken = await this.jwtService.verifyAsync(token);
+        request.user = decodedToken;
+        this.injectTenantContext(decodedToken, request);
         return true;
       } catch (jwtError: any) {
         throw new UnauthorizedException(
@@ -88,5 +93,17 @@ export class NeuralAuthGuard implements CanActivate {
         );
       }
     }
+  }
+
+  private injectTenantContext(decodedToken: any, request: any) {
+    const tenantId = decodedToken.tenantId || request.headers['x-tenant-id'] || 'default-tenant';
+    const organizationId = decodedToken.organizationId || request.headers['x-organization-id'];
+    const environment = decodedToken.environment || process.env.NODE_ENV || 'development';
+
+    tenantContext.enterWith({
+      tenantId,
+      organizationId,
+      environment,
+    });
   }
 }

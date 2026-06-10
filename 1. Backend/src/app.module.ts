@@ -48,6 +48,9 @@ import { ReconciliationModule } from './reconciliation/reconciliation.module';
 import { HealthController } from './health.controller';
 import { ScheduleModule } from '@nestjs/schedule';
 import { MetricsModule } from './metrics/metrics.module';
+import { TenantModule } from './common/tenant/tenant.module';
+import { EcosystemModule } from './ecosystem/ecosystem.module';
+import { DeveloperPortalModule } from './developer-portal/developer-portal.module';
 
 @Module({
   imports: [
@@ -96,6 +99,9 @@ import { MetricsModule } from './metrics/metrics.module';
     InfraModule,
     ReconciliationModule,
     MetricsModule,
+    TenantModule,
+    EcosystemModule,
+    DeveloperPortalModule,
   ],
   controllers: [HealthController],
 })

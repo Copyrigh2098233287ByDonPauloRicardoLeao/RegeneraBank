@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountEntity } from '../core/entities/account.entity';
 import { TransactionEntity } from '../core/entities/transaction.entity';
 import { OutboxEventEntity } from '../core/entities/outbox-event.entity';
+import { ReconciliationRunEntity } from './entities/reconciliation-run.entity';
+import { InvestmentEntity } from '../investments/entities/investment.entity';
 import { ReconciliationService } from './reconciliation.service';
 
 @Module({
@@ -11,6 +13,8 @@ import { ReconciliationService } from './reconciliation.service';
       AccountEntity,
       TransactionEntity,
       OutboxEventEntity,
+      ReconciliationRunEntity,
+      InvestmentEntity,
     ]),
   ],
   providers: [ReconciliationService],

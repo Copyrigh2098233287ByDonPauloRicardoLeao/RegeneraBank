@@ -36,6 +36,7 @@ import { IdempotencyService } from './idempotency.service';
 import { PixEventsGateway } from './pix.gateway';
 import { AccountEntity } from './entities/account.entity';
 import { MetricsService } from '../metrics/metrics.service';
+import { TracingService } from '../infra/tracing/tracing.service';
 
 interface PixSpiPayload {
   endToEndId: string;
@@ -62,6 +63,7 @@ export class PixService {
     @Inject(forwardRef(() => PixEventsGateway))
     private readonly eventsGateway: PixEventsGateway,
     private readonly metricsService: MetricsService,
+    private readonly tracingService: TracingService,
   ) {}
 
   /**
@@ -145,30 +147,31 @@ export class PixService {
     amount: number,
     idempotencyKey?: string,
   ) {
-    this.metricsService.incrementPixRequests();
-    if (amount <= 0) {
-      this.metricsService.incrementPixFailed();
-      throw new BadRequestException('Valor transacional inválido para PIX.');
-    }
-
-    if (amount >= 9999) {
-      this.metricsService.incrementPixFailed();
-      throw new ForbiddenException(
-        'Transação bloqueada preventivamente pela esteira de segurança.',
-      );
-    }
-
-    if (idempotencyKey) {
-      const cached = await this.idempotencyGuard.get(idempotencyKey);
-      if (cached) {
-        this.metricsService.incrementPixReplays();
-        const data = cached.body || cached.payload || cached;
-        return { ...data, isCached: true };
-      }
-      await this.idempotencyGuard.acquireLock(idempotencyKey, senderNeuralId);
-    }
-
+    this.tracingService.startSpan('executePix', { senderNeuralId, receiverKey, amount });
     try {
+      this.metricsService.incrementPixRequests();
+      if (amount <= 0) {
+        this.metricsService.incrementPixFailed();
+        throw new BadRequestException('Valor transacional inválido para PIX.');
+      }
+
+      if (amount >= 9999) {
+        this.metricsService.incrementPixFailed();
+        throw new ForbiddenException(
+          'Transação bloqueada preventivamente pela esteira de segurança.',
+        );
+      }
+
+      if (idempotencyKey) {
+        const cached = await this.idempotencyGuard.get(idempotencyKey);
+        if (cached) {
+          this.metricsService.incrementPixReplays();
+          const data = cached.body || cached.payload || cached;
+          return { ...data, isCached: true };
+        }
+        await this.idempotencyGuard.acquireLock(idempotencyKey, senderNeuralId);
+      }
+
       const result = await this.ledgerService.executePixAtomic(
         senderNeuralId,
         receiverKey,
@@ -206,6 +209,8 @@ export class PixService {
         await this.idempotencyGuard.releaseLock(idempotencyKey, senderNeuralId);
       }
       throw e;
+    } finally {
+      this.tracingService.endSpan();
     }
   }
 
