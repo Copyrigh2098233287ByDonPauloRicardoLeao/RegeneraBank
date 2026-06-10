@@ -28,10 +28,10 @@ export class ApiSubscriptionEntity {
   @Column({ nullable: true })
   createdBy: string;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ nullable: true })
   lastUsedAt: Date;
 
-  @Column({ type: 'timestamp', nullable: true })
+  @Column({ nullable: true })
   revokedAt: Date;
 
   @CreateDateColumn()
