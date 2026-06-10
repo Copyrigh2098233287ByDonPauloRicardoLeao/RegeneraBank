@@ -68,6 +68,7 @@ describe('Pix Concurrency & Idempotency Test', () => {
             }),
             get: jest.fn().mockResolvedValue(null),
             save: jest.fn(),
+            releaseLock: jest.fn(),
           },
         },
         {
